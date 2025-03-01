@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # File: tests/test_gui.py
 
-from src.ui.visualization import FileTypeBar
-from src.ui.main_window import MainWindow
-from src.ui.file_table import FileTableView
-from src.ui.directory_tree import DirectoryTreeView
 import os
 import sys
 import unittest
@@ -14,9 +10,14 @@ from PyQt6.QtGui import QStandardItemModel
 from PyQt6.QtTest import QTest
 from PyQt6.QtWidgets import QApplication
 
+from src.ui.directory_tree import DirectoryTreeView
+from src.ui.file_table import FileTableView
+from src.ui.main_window import MainWindow
+from src.ui.visualization import FileTypeBar
+
 # Add the src directory to the path
 sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..')))
+    os.path.join(os.path.dirname(__file__), "..")))
 
 
 class MockMainWindow:
@@ -63,18 +64,33 @@ class TestGUIComponents(unittest.TestCase):
 
         # Test with some data
         test_files = [
-            {'name': 'test1.txt', 'size': 1000, 'type': 'TXT',
-                'modified': None, 'path': None},
-            {'name': 'test2.txt', 'size': 2000, 'type': 'TXT',
-                'modified': None, 'path': None},
-            {'name': 'test.exe', 'size': 5000, 'type': 'EXE',
-                'modified': None, 'path': None}
+            {
+                "name": "test1.txt",
+                "size": 1000,
+                "type": "TXT",
+                "modified": None,
+                "path": None,
+            },
+            {
+                "name": "test2.txt",
+                "size": 2000,
+                "type": "TXT",
+                "modified": None,
+                "path": None,
+            },
+            {
+                "name": "test.exe",
+                "size": 5000,
+                "type": "EXE",
+                "modified": None,
+                "path": None,
+            },
         ]
         bar.update_data(test_files)
-        self.assertEqual(bar.data['TXT'], 3000)
-        self.assertEqual(bar.data['EXE'], 5000)
+        self.assertEqual(bar.data["TXT"], 3000)
+        self.assertEqual(bar.data["EXE"], 5000)
         self.assertEqual(bar.total_size, 8000)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

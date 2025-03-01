@@ -14,8 +14,8 @@ setup(
     name="file-system-analyzer",
     version=version,
     description="A desktop application for visualizing and analyzing file system data",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Anirban Das",
+    author_email="anirbandas59@outlook.com",
     url="https://github.com/yourusername/file-system-analyzer",
     packages=find_packages(),
     install_requires=[
