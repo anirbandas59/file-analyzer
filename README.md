@@ -34,7 +34,7 @@ python -m src.main
 
 ## Project Structure
 
-```
+```bash
 FileAnalyzer/
 ├── src/
 │   ├── __init__.py

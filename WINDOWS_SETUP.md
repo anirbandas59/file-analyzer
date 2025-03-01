@@ -16,13 +16,13 @@ This guide will help you install and run the File System Analyzer on a Windows m
 2. Open Command Prompt and navigate to the project directory
 3. Install the required dependencies:
 
-```
+```bash
 pip install PyQt6
 ```
 
-4. Run the application by double-clicking `run.bat` or executing:
+4.Run the application by double-clicking `run.bat` or executing:
 
-```
+```bash
 python -m src.main
 ```
 
@@ -32,25 +32,25 @@ python -m src.main
 2. Open Command Prompt and navigate to the project directory
 3. Create a virtual environment:
 
-```
+```bash
 python -m venv venv
 ```
 
-4. Activate the virtual environment:
+4.Activate the virtual environment:
 
-```
+```bash
 venv\Scripts\activate
 ```
 
-5. Install the required dependencies:
+5.Install the required dependencies:
 
-```
+```bash
 pip install PyQt6
 ```
 
-6. Run the application:
+6.Run the application:
 
-```
+```bash
 python -m src.main
 ```
 
@@ -60,7 +60,7 @@ python -m src.main
 
 If you get an error about PyQt6 not being found, make sure you have installed it correctly:
 
-```
+```bash
 pip install PyQt6
 ```
 
@@ -68,7 +68,7 @@ pip install PyQt6
 
 If the `python` command is not recognized, try using `py` instead:
 
-```
+```bash
 py -m pip install PyQt6
 py -m src.main
 ```
@@ -79,7 +79,7 @@ py -m src.main
 - Check that PyQt6 is properly installed
 - Try running with verbose output:
 
-```
+```bash
 python -m src.main --verbose
 ```
 

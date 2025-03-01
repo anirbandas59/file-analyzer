@@ -7,14 +7,14 @@
     // "python.linting.pylintArgs": [
     //     "--init-hook='import sys; sys.path.append(\"src\")'"
     // ],
-    "python.formatting.provider": "autopep8",
-    "python.formatting.autopep8Args": [
-        "--max-line-length=100",
-        "--aggressive"
-    ],
+    // "python.formatting.provider": "autopep8",
+    // "python.formatting.autopep8Args": [
+    //     "--max-line-length=100",
+    //     "--aggressive"
+    // ],
     "python.testing.unittestEnabled": true,
     "python.testing.pytestEnabled": false,
-    "python.testing.nosetestsEnabled": false,
+    // "python.testing.nosetestsEnabled": false,
     "python.testing.unittestArgs": [
         "-v",
         "-s",
