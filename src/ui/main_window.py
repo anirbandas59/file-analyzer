@@ -10,6 +10,11 @@ from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
 from .directory_tree import DirectoryTreeView
 from .file_table import FileTableView
 from .visualization import FileTypeBar
+from .themes.theme_manager import theme_manager
+from .components.modern_button import ModernButton
+from .components.card_widget import CardWidget, TitleCard
+from .components.visualization import VisualizationDashboard
+from .components.management import ManagementDashboard
 
 
 class MainWindow(QMainWindow):
@@ -22,6 +27,12 @@ class MainWindow(QMainWindow):
 
         # Set window properties
         self.setWindowTitle("File System Analyzer")
+        
+        # Apply modern theme
+        theme_manager.apply_theme("light")
+        
+        # Initialize state
+        self.current_scan_path = ""
 
         # Create the central widget and main layout
         self.central_widget = QWidget()
@@ -31,28 +42,24 @@ class MainWindow(QMainWindow):
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
 
         # Create and setup the left panel (directory tree)
-        self.left_panel = QWidget()
-        self.left_layout = QVBoxLayout(self.left_panel)
-        self.directory_label = QLabel("Directories")
-        self.directory_label.setStyleSheet(
-            "font-weight: bold; font-size: 14px;")
+        self.left_panel = TitleCard("Directories", "Navigate and select folders")
         self.directory_tree = DirectoryTreeView()
-        self.scan_button = QPushButton("Scan")
+        self.scan_button = ModernButton("Scan", "primary")
         self.scan_button.clicked.connect(self.on_scan_clicked)
 
-        self.left_layout.addWidget(self.directory_label)
-        self.left_layout.addWidget(
-            self.directory_tree, 1)  # 1 = stretch factor
-        self.left_layout.addWidget(self.scan_button)
+        self.left_panel.add_content_widget(self.directory_tree)
+        self.left_panel.add_content_widget(self.scan_button)
 
         # Create and setup the right panel (content area)
-        self.right_panel = QWidget()
+        self.right_panel = CardWidget()
         self.right_layout = QVBoxLayout(self.right_panel)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
 
         # Create tab widget for different views
         self.tab_widget = QTabWidget()
         self.files_tab = QWidget()
         self.charts_tab = QWidget()
+        self.management_tab = QWidget()
 
         # Setup files tab
         self.files_layout = QVBoxLayout(self.files_tab)
@@ -69,11 +76,10 @@ class MainWindow(QMainWindow):
         self.file_table = FileTableView()
 
         # Add visualization bar
-        self.viz_frame = QFrame()
-        self.viz_frame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.viz_frame.setMinimumHeight(40)
-        self.viz_layout = QHBoxLayout(self.viz_frame)
-        self.viz_label = QLabel("Size Distribution:")
+        self.viz_card = CardWidget()
+        self.viz_card.setMinimumHeight(60)
+        self.viz_layout = QHBoxLayout(self.viz_card)
+        self.viz_label = QLabel("File Type Distribution:")
         self.viz_layout.addWidget(self.viz_label)
         self.file_type_bar = FileTypeBar()
         self.viz_layout.addWidget(self.file_type_bar, 1)  # 1 = stretch factor
@@ -81,18 +87,24 @@ class MainWindow(QMainWindow):
         # Assemble files tab
         self.files_layout.addLayout(self.search_layout)
         self.files_layout.addWidget(self.file_table, 1)  # 1 = stretch factor
-        self.files_layout.addWidget(self.viz_frame)
+        self.files_layout.addWidget(self.viz_card)
 
-        # Setup charts tab (placeholder for now)
+        # Setup charts tab with visualization dashboard
         self.charts_layout = QVBoxLayout(self.charts_tab)
-        self.charts_placeholder = QLabel(
-            "Charts view will be implemented in phase 2")
-        self.charts_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.charts_layout.addWidget(self.charts_placeholder)
+        self.charts_layout.setContentsMargins(0, 0, 0, 0)
+        self.visualization_dashboard = VisualizationDashboard()
+        self.charts_layout.addWidget(self.visualization_dashboard)
+        
+        # Setup management tab with smart file management dashboard
+        self.management_layout = QVBoxLayout(self.management_tab)
+        self.management_layout.setContentsMargins(0, 0, 0, 0)
+        self.management_dashboard = ManagementDashboard()
+        self.management_layout.addWidget(self.management_dashboard)
 
         # Add tabs to the tab widget
         self.tab_widget.addTab(self.files_tab, "Files")
         self.tab_widget.addTab(self.charts_tab, "Charts")
+        self.tab_widget.addTab(self.management_tab, "Management")
 
         # Add tab widget to right panel
         self.right_layout.addWidget(self.tab_widget)
@@ -119,12 +131,15 @@ class MainWindow(QMainWindow):
         self.directory_tree.directory_selected.connect(
             self.on_directory_selected)
         self.file_type_bar.bar_clicked.connect(self.on_file_type_clicked)
+        self.visualization_dashboard.drill_down_requested.connect(
+            self.on_dashboard_drill_down)
 
         # Initial status message
         self.update_status("Ready - Select a directory to analyze")
 
     def on_directory_selected(self, path):
         """Handler for when a directory is selected in the tree view."""
+        self.current_scan_path = path
         self.update_status(f"Selected directory: {path}")
         self.file_table.update_files(path)
 
@@ -132,6 +147,7 @@ class MainWindow(QMainWindow):
         """Handler for scan button click."""
         current_path = self.directory_tree.get_selected_path()
         if current_path:
+            self.current_scan_path = current_path
             self.update_status(f"Scanning directory: {current_path}")
             self.file_table.update_files(current_path, full_scan=True)
 
@@ -142,6 +158,16 @@ class MainWindow(QMainWindow):
     def on_file_type_clicked(self, file_type):
         """Handler for when a file type segment is clicked in the visualization."""
         self.search_input.setText(file_type)
+
+    def on_dashboard_drill_down(self, path, filter_data):
+        """Handler for dashboard drill-down requests."""
+        if filter_data.get('type') == 'file_type':
+            # Filter by file type
+            file_type = filter_data.get('value', '')
+            self.search_input.setText(file_type)
+        elif filter_data.get('type') == 'directory':
+            # Navigate to directory (future implementation)
+            pass
 
     def update_status(self, message):
         """Updates the status bar with a message."""

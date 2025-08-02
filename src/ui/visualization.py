@@ -9,6 +9,7 @@ from PyQt6.QtGui import QBrush, QColor, QPainter, QPen
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from src.utils.file_utils import format_size
+from .themes.styles import ModernTheme
 
 
 class FileTypeBar(QWidget):
@@ -29,25 +30,8 @@ class FileTypeBar(QWidget):
         # Initialize data structures
         self.data = {}  # Dictionary of {type: size}
         self.total_size = 0
-        self.colors = {
-            # Pre-defined colors for common file types
-            "EXE": QColor(52, 152, 219),  # Blue
-            "DLL": QColor(46, 204, 113),  # Green
-            "PDF": QColor(231, 76, 60),   # Red
-            "DOC": QColor(155, 89, 182),  # Purple
-            "DOCX": QColor(155, 89, 182),  # Purple
-            "XLS": QColor(46, 204, 113),  # Green
-            "XLSX": QColor(46, 204, 113),  # Green
-            "JPG": QColor(241, 196, 15),  # Yellow
-            "JPEG": QColor(241, 196, 15),  # Yellow
-            "PNG": QColor(243, 156, 18),  # Orange
-            "TXT": QColor(149, 165, 166),  # Gray
-            "ZIP": QColor(52, 73, 94),    # Dark Blue
-            "RAR": QColor(52, 73, 94),    # Dark Blue
-            "MP3": QColor(142, 68, 173),  # Purple
-            "MP4": QColor(41, 128, 185),  # Blue
-            "OTHER": QColor(189, 195, 199)  # Light Gray
-        }
+        # Use theme colors for consistent styling
+        self.colors = ModernTheme.FILE_COLORS
 
         # Setup layout
         self.layout = QHBoxLayout(self)
@@ -105,8 +89,8 @@ class FileTypeBar(QWidget):
 
         # If no data, just draw a placeholder
         if not self.data and not self.test_data:
-            painter.fillRect(self.rect(), QColor(245, 245, 245))
-            painter.setPen(QColor(150, 150, 150))
+            painter.fillRect(self.rect(), ModernTheme.LIGHT_GRAY)
+            painter.setPen(ModernTheme.DARK_GRAY)
             painter.drawText(
                 self.rect(), Qt.AlignmentFlag.AlignCenter, "No data available")
             return

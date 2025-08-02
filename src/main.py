@@ -6,6 +6,7 @@ import sys
 from PyQt6.QtWidgets import QApplication
 
 from src.ui.main_window import MainWindow
+from src.ui.themes.theme_manager import theme_manager
 
 
 def main():
@@ -16,6 +17,9 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName("File Analyzer")
     app.setStyle("Fusion")
+    
+    # Apply modern theme
+    theme_manager.apply_theme("light")
 
     # Create and show the main window
     main_window = MainWindow()

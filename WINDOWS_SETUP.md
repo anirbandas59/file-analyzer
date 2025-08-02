@@ -4,55 +4,45 @@ This guide will help you install and run the File System Analyzer on a Windows m
 
 ## Prerequisites
 
-1. **Python 3.8 or later**
+1. **Python 3.10 or later**
    - Download the latest Python from [python.org](https://www.python.org/downloads/windows/)
    - During installation, check "Add Python to PATH"
 
-## Installation
+## Optional: Enable Long Path Support
 
-### Option 1: Direct Installation
+To work with very long file paths, enable long path support:
+1. Open Group Policy Editor (`gpedit.msc`)
+2. Go to `Local Computer Policy > Computer Configuration > Administrative Templates > System > Filesystem`
+3. Enable "Enable Win32 long paths"
 
-1. Clone or download this repository
-2. Open Command Prompt and navigate to the project directory
-3. Install the required dependencies:
+## Installation & Running
 
-```
-pip install PyQt6
-```
-
-4. Run the application by double-clicking `run.bat` or executing:
-
-```
-python -m src.main
-```
-
-### Option 2: Create a Virtual Environment (Recommended)
+### Quick Start (Recommended)
 
 1. Clone or download this repository
-2. Open Command Prompt and navigate to the project directory
-3. Create a virtual environment:
+2. Double-click `run.bat` in the project folder
+   - This will check Python, set up a virtual environment, install dependencies, and launch the app
 
-```
-python -m venv venv
-```
+### Manual Setup
 
-4. Activate the virtual environment:
+1. Open Command Prompt and navigate to the project directory
+2. (Optional) Create a virtual environment:
+   ```bat
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+3. Install dependencies:
+   ```bat
+   pip install -r requirements.txt
+   ```
+4. Run the application:
+   ```bat
+   python -m src.main
+   ```
 
-```
-venv\Scripts\activate
-```
+## Admin Rights
 
-5. Install the required dependencies:
-
-```
-pip install PyQt6
-```
-
-6. Run the application:
-
-```
-python -m src.main
-```
+Some file operations (deleting, moving, or modifying protected files) may require administrator rights. If you encounter permission errors, try running the app as an administrator.
 
 ## Troubleshooting
 
@@ -75,7 +65,7 @@ py -m src.main
 
 ### Application Crashes on Start
 
-- Make sure you have Python 3.8+
+- Make sure you have Python 3.10+
 - Check that PyQt6 is properly installed
 - Try running with verbose output:
 

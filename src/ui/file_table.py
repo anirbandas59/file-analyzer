@@ -85,6 +85,16 @@ class FileTableView(QTableView):
         # Update the visualization bar if available
         if hasattr(main_window, 'file_type_bar'):
             main_window.file_type_bar.update_data(file_list)
+            
+        # Update the dashboard if available
+        if hasattr(main_window, 'visualization_dashboard'):
+            current_path = getattr(main_window, 'current_scan_path', "")
+            main_window.visualization_dashboard.update_data(file_list, current_path)
+            
+        # Update the management dashboard if available
+        if hasattr(main_window, 'management_dashboard'):
+            current_path = getattr(main_window, 'current_scan_path', "")
+            main_window.management_dashboard.update_data(file_list, current_path)
 
     def filter_files(self, text):
         """Filter files based on search text."""

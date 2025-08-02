@@ -10,6 +10,8 @@ dependencies = [
     "pyqt6==6.8.1",
     "pyqt6-qt6==6.8.2",
     "pyqt6-sip==13.10.0",
+    "pyqtgraph>=0.13.0",
     "pytest>=8.4.1",
     "ruff>=0.12.7",
+    "setuptools>=80.9.0",
 ]
