@@ -71,6 +71,7 @@ class ThemeManager(QObject):
         /* Panels and Containers */
         QWidget {{
             background-color: {ModernTheme.PANEL_BACKGROUND.name()};
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
             border-radius: {BorderRadius.SM};
         }}
 
@@ -78,6 +79,7 @@ class ThemeManager(QObject):
             background-color: {ModernTheme.PANEL_BACKGROUND.name()};
             border: 1px solid {ModernTheme.BORDER.name()};
             border-radius: {BorderRadius.MD};
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
         }}
 
         /* Splitter */
@@ -124,6 +126,18 @@ class ThemeManager(QObject):
             border: none;
         }}
 
+        /* Title Cards and Headers */
+        QLabel[class=\"title\"] {{
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
+            font-weight: {Typography.WEIGHT_BOLD};
+            background-color: transparent;
+        }}
+
+        QLabel[class=\"subtitle\"] {{
+            color: {ModernTheme.DARK_GRAY.name()};
+            background-color: transparent;
+        }}
+
         /* Input Fields */
         QLineEdit {{
             background-color: {ModernTheme.WHITE.name()};
@@ -145,25 +159,29 @@ class ThemeManager(QObject):
 
         /* Tree View */
         QTreeView {{
-            background-color: {ModernTheme.LIGHT_GRAY.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
+            background-color: {ModernTheme.WHITE.name()};
+            border: 1px solid {ModernTheme.MEDIUM_GRAY.name()};
             border-radius: {BorderRadius.MD};
-            selection-background-color: {ModernTheme.SELECTED.name()};
+            selection-background-color: {ModernTheme.PRIMARY.name()};
             outline: none;
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
         }}
 
         QTreeView::item {{
             padding: {Spacing.XS}px {Spacing.SM}px;
             border: none;
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
+            background-color: {ModernTheme.WHITE.name()};
         }}
 
         QTreeView::item:hover {{
-            background-color: {ModernTheme.HOVER.name()};
+            background-color: {ModernTheme.PRIMARY_LIGHT.name()};
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
         }}
 
         QTreeView::item:selected {{
-            background-color: {ModernTheme.SELECTED.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
+            background-color: {ModernTheme.PRIMARY.name()};
+            color: {ModernTheme.WHITE.name()};
         }}
 
         QTreeView::branch:has-children:!has-siblings:closed,
@@ -320,6 +338,14 @@ class ThemeManager(QObject):
         QWidget {{
             background-color: {DarkTheme.PANEL_BACKGROUND.name()};
             color: {DarkTheme.VERY_DARK_GRAY.name()};
+            border: none;
+        }}
+
+        QFrame {{
+            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
+            border: 1px solid {DarkTheme.BORDER.name()};
+            border-radius: {BorderRadius.MD};
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
         }}
 
         /* Tab Widget */
@@ -384,6 +410,18 @@ class ThemeManager(QObject):
             border: none;
         }}
 
+        /* Title Cards and Headers */
+        QLabel[class=\"title\"] {{
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
+            font-weight: {Typography.WEIGHT_BOLD};
+            background-color: transparent;
+        }}
+
+        QLabel[class=\"subtitle\"] {{
+            color: {DarkTheme.DARK_GRAY.name()};
+            background-color: transparent;
+        }}
+
         /* Input Fields */
         QLineEdit {{
             background-color: {DarkTheme.LIGHT_GRAY.name()};
@@ -405,25 +443,29 @@ class ThemeManager(QObject):
 
         /* Tree View */
         QTreeView {{
-            background-color: {DarkTheme.LIGHT_GRAY.name()};
+            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
             border: 1px solid {DarkTheme.BORDER.name()};
             border-radius: {BorderRadius.MD};
-            selection-background-color: {DarkTheme.SELECTED.name()};
+            selection-background-color: {DarkTheme.PRIMARY.name()};
             outline: none;
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
         }}
 
         QTreeView::item {{
             padding: {Spacing.SM}px;
             border: none;
             color: {DarkTheme.VERY_DARK_GRAY.name()};
+            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
         }}
 
         QTreeView::item:hover {{
             background-color: {DarkTheme.HOVER.name()};
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
         }}
 
         QTreeView::item:selected {{
-            background-color: {DarkTheme.SELECTED.name()};
+            background-color: {DarkTheme.PRIMARY.name()};
+            color: {DarkTheme.WHITE.name()};
         }}
 
         QTreeView::branch:has-siblings:!adjoins-item {{

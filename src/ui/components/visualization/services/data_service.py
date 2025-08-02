@@ -4,7 +4,7 @@
 from datetime import datetime, timedelta
 from typing import Any
 
-from ....themes.styles import ModernTheme, FILE_COLORS
+from ....themes.styles import FILE_COLORS
 from ..models.chart_data import (
     ChartDataTransformer,
     ChartMetadata,

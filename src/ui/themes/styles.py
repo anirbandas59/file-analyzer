@@ -19,9 +19,9 @@ class ModernTheme:
     # Neutral Colors
     WHITE = QColor("#ffffff")
     LIGHT_GRAY = QColor("#f8f9fa")  # Panel backgrounds
-    MEDIUM_GRAY = QColor("#e9ecef")  # Borders and dividers
-    DARK_GRAY = QColor("#6c757d")  # Secondary text
-    VERY_DARK_GRAY = QColor("#343a40")  # Primary text
+    MEDIUM_GRAY = QColor("#dee2e6")  # Borders and dividers
+    DARK_GRAY = QColor("#495057")  # Secondary text (darker for better contrast)
+    VERY_DARK_GRAY = QColor("#212529")  # Primary text (darker for better contrast)
 
     # Background Colors
     BACKGROUND = QColor("#f5f5f5")  # Main background (from mockup)
@@ -61,8 +61,8 @@ class DarkTheme:
     WHITE = QColor("#ffffff")
     LIGHT_GRAY = QColor("#3c4043")  # Dark panel backgrounds
     MEDIUM_GRAY = QColor("#5f6368")  # Dark borders and dividers
-    DARK_GRAY = QColor("#bdc1c6")  # Light secondary text
-    VERY_DARK_GRAY = QColor("#e8eaed")  # Light primary text
+    DARK_GRAY = QColor("#9aa0a6")  # Medium secondary text for better contrast
+    VERY_DARK_GRAY = QColor("#e8eaed")  # Light primary text with better contrast
 
     # Background Colors (dark variants)
     BACKGROUND = QColor("#202124")  # Dark main background

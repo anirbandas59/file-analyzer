@@ -8,7 +8,7 @@ from PyQt6.QtCore import QRect, Qt, pyqtSignal
 from PyQt6.QtGui import QPainter
 from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
-from .themes.styles import ModernTheme, FILE_COLORS
+from .themes.styles import FILE_COLORS, ModernTheme
 
 
 class FileTypeBar(QWidget):
