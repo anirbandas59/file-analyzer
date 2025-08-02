@@ -8,7 +8,7 @@ from PyQt6.QtCore import QRect, Qt, pyqtSignal
 from PyQt6.QtGui import QPainter
 from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
-from .themes.styles import ModernTheme
+from .themes.styles import ModernTheme, FILE_COLORS
 
 
 class FileTypeBar(QWidget):
@@ -30,7 +30,7 @@ class FileTypeBar(QWidget):
         self.data = {}  # Dictionary of {type: size}
         self.total_size = 0
         # Use theme colors for consistent styling
-        self.colors = ModernTheme.FILE_COLORS
+        self.colors = FILE_COLORS
 
         # Setup layout
         self.layout = QHBoxLayout(self)

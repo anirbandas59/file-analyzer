@@ -71,11 +71,20 @@ class MainWindow(QMainWindow):
         # Setup files tab
         self.files_layout = QVBoxLayout(self.files_tab)
 
-        # Add search bar
+        # Add search bar and theme toggle
         self.search_layout = QHBoxLayout()
+
+        # Theme toggle button
+        self.theme_toggle_btn = ModernButton("🌙", "secondary")
+        self.theme_toggle_btn.setMaximumWidth(40)
+        self.theme_toggle_btn.setToolTip("Toggle Dark/Light Theme")
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
+
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search files...")
         self.search_input.textChanged.connect(self.on_search_text_changed)
+
+        self.search_layout.addWidget(self.theme_toggle_btn)
         self.search_layout.addStretch(1)
         self.search_layout.addWidget(self.search_input)
 
@@ -179,3 +188,17 @@ class MainWindow(QMainWindow):
     def update_status(self, message):
         """Updates the status bar with a message."""
         self.status_label.setText(message)
+
+    def toggle_theme(self):
+        """Toggle between light and dark themes."""
+        current_theme = theme_manager.get_current_theme()
+        new_theme = "dark" if current_theme == "light" else "light"
+        theme_manager.apply_theme(new_theme)
+
+        # Update button icon and tooltip
+        if new_theme == "dark":
+            self.theme_toggle_btn.setText("☀️")
+            self.theme_toggle_btn.setToolTip("Switch to Light Theme")
+        else:
+            self.theme_toggle_btn.setText("🌙")
+            self.theme_toggle_btn.setToolTip("Switch to Dark Theme")

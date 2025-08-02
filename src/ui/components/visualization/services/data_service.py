@@ -4,7 +4,7 @@
 from datetime import datetime, timedelta
 from typing import Any
 
-from ....themes.styles import ModernTheme
+from ....themes.styles import ModernTheme, FILE_COLORS
 from ..models.chart_data import (
     ChartDataTransformer,
     ChartMetadata,
@@ -47,7 +47,7 @@ class VisualizationDataService:
         type_data = ChartDataTransformer.files_to_type_data(self.current_files)
 
         # Apply theme colors to file types
-        color_map = ModernTheme.FILE_COLORS
+        color_map = FILE_COLORS
         for item in type_data:
             item.color = color_map.get(
                 item.type, color_map.get("OTHER", "#bdc3c7")
