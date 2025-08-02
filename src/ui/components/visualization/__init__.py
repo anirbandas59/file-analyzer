@@ -3,4 +3,4 @@
 
 from .dashboard import VisualizationDashboard
 
-__all__ = ['VisualizationDashboard']
+__all__ = ["VisualizationDashboard"]

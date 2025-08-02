@@ -3,16 +3,16 @@
 
 import os
 import time
-from datetime import datetime
-from pathlib import Path
 
-from PyQt6.QtCore import (QAbstractTableModel, QModelIndex, QSize, Qt, QThread,
-                          QVariant, pyqtSignal)
-from PyQt6.QtGui import QBrush, QColor
+from PyQt6.QtCore import (
+    Qt,
+    QThread,
+    pyqtSignal,
+)
 from PyQt6.QtWidgets import QAbstractItemView, QHeaderView, QTableView
 
 from src.models.file_system_model import FileSystemTableModel
-from src.utils.file_utils import format_size, get_file_type, scan_directory
+from src.utils.file_utils import format_size, scan_directory
 
 
 class FileTableView(QTableView):
@@ -28,10 +28,8 @@ class FileTableView(QTableView):
         self.setModel(self.model)
 
         # Configure the table view
-        self.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows)
-        self.setSelectionMode(
-            QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setSortingEnabled(True)
         self.setAlternatingRowColors(True)
         self.setShowGrid(False)
@@ -41,8 +39,7 @@ class FileTableView(QTableView):
         header = self.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         for i in range(1, 4):  # Columns 1-3 (Size, Date, Type)
-            header.setSectionResizeMode(
-                i, QHeaderView.ResizeMode.ResizeToContents)
+            header.setSectionResizeMode(i, QHeaderView.ResizeMode.ResizeToContents)
 
         # Initial sort by name ascending
         self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
@@ -76,24 +73,24 @@ class FileTableView(QTableView):
 
         # Get the parent window to update status and visualization
         main_window = self.window()
-        if hasattr(main_window, 'update_status'):
+        if hasattr(main_window, "update_status"):
             size_str = format_size(total_size)
             main_window.update_status(
                 f"{len(file_list):,} files, {size_str} total, scan completed in {scan_time:.2f}s"
             )
 
         # Update the visualization bar if available
-        if hasattr(main_window, 'file_type_bar'):
+        if hasattr(main_window, "file_type_bar"):
             main_window.file_type_bar.update_data(file_list)
-            
+
         # Update the dashboard if available
-        if hasattr(main_window, 'visualization_dashboard'):
-            current_path = getattr(main_window, 'current_scan_path', "")
+        if hasattr(main_window, "visualization_dashboard"):
+            current_path = getattr(main_window, "current_scan_path", "")
             main_window.visualization_dashboard.update_data(file_list, current_path)
-            
+
         # Update the management dashboard if available
-        if hasattr(main_window, 'management_dashboard'):
-            current_path = getattr(main_window, 'current_scan_path', "")
+        if hasattr(main_window, "management_dashboard"):
+            current_path = getattr(main_window, "current_scan_path", "")
             main_window.management_dashboard.update_data(file_list, current_path)
 
     def filter_files(self, text):
@@ -104,6 +101,7 @@ class FileTableView(QTableView):
 
 class ScannerThread(QThread):
     """Background thread for scanning directories."""
+
     files_ready = pyqtSignal(list, int, float)  # files, total size, scan time
 
     def __init__(self, path, full_scan=False):

@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # File: src/models/file_system_model.py
 
-import os
-from datetime import datetime
 
-from PyQt6.QtCore import (QAbstractTableModel, QModelIndex,
-                          QSortFilterProxyModel, Qt, QVariant)
+from PyQt6.QtCore import QAbstractTableModel, QModelIndex, Qt, QVariant
 from PyQt6.QtGui import QBrush, QColor
 
-from src.utils.file_utils import format_size, get_file_type
+from src.utils.file_utils import format_size
 
 
 class FileSystemTableModel(QAbstractTableModel):
@@ -41,13 +38,13 @@ class FileSystemTableModel(QAbstractTableModel):
 
         if role == Qt.ItemDataRole.DisplayRole:
             if column == 0:  # Name
-                return file_info['name']
+                return file_info["name"]
             elif column == 1:  # Size
-                return format_size(file_info['size'])
+                return format_size(file_info["size"])
             elif column == 2:  # Modified date
-                return file_info['modified'].strftime("%Y-%m-%d %H:%M")
+                return file_info["modified"].strftime("%Y-%m-%d %H:%M")
             elif column == 3:  # Type
-                return file_info['type']
+                return file_info["type"]
 
         elif role == Qt.ItemDataRole.BackgroundRole:
             # Alternate row colors
@@ -66,7 +63,10 @@ class FileSystemTableModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """Return the header data."""
-        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
+        if (
+            orientation == Qt.Orientation.Horizontal
+            and role == Qt.ItemDataRole.DisplayRole
+        ):
             return self.headers[section]
         return QVariant()
 
@@ -75,17 +75,24 @@ class FileSystemTableModel(QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
 
         if column == 0:  # Name
-            self.files.sort(key=lambda x: x['name'].lower(),
-                            reverse=(order == Qt.SortOrder.DescendingOrder))
+            self.files.sort(
+                key=lambda x: x["name"].lower(),
+                reverse=(order == Qt.SortOrder.DescendingOrder),
+            )
         elif column == 1:  # Size
-            self.files.sort(key=lambda x: x['size'],
-                            reverse=(order == Qt.SortOrder.DescendingOrder))
+            self.files.sort(
+                key=lambda x: x["size"], reverse=(order == Qt.SortOrder.DescendingOrder)
+            )
         elif column == 2:  # Modified date
-            self.files.sort(key=lambda x: x['modified'],
-                            reverse=(order == Qt.SortOrder.DescendingOrder))
+            self.files.sort(
+                key=lambda x: x["modified"],
+                reverse=(order == Qt.SortOrder.DescendingOrder),
+            )
         elif column == 3:  # Type
-            self.files.sort(key=lambda x: x['type'].lower(),
-                            reverse=(order == Qt.SortOrder.DescendingOrder))
+            self.files.sort(
+                key=lambda x: x["type"].lower(),
+                reverse=(order == Qt.SortOrder.DescendingOrder),
+            )
 
         self.layoutChanged.emit()
 
@@ -110,7 +117,8 @@ class FileSystemTableModel(QAbstractTableModel):
 
         filter_text = self.filter_text.lower()
         self.files = [
-            file for file in self.original_files
-            if filter_text in file['name'].lower() or
-            filter_text in file['type'].lower()
+            file
+            for file in self.original_files
+            if filter_text in file["name"].lower()
+            or filter_text in file["type"].lower()
         ]

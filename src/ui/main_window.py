@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
 # File: src/ui/main_window.py
 
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
-                             QMainWindow, QPushButton, QSplitter, QStatusBar,
-                             QTabWidget, QVBoxLayout, QWidget)
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QSplitter,
+    QStatusBar,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
+from .components.card_widget import CardWidget, TitleCard
+from .components.management import ManagementDashboard
+from .components.modern_button import ModernButton
+from .components.visualization import VisualizationDashboard
 from .directory_tree import DirectoryTreeView
 from .file_table import FileTableView
-from .visualization import FileTypeBar
 from .themes.theme_manager import theme_manager
-from .components.modern_button import ModernButton
-from .components.card_widget import CardWidget, TitleCard
-from .components.visualization import VisualizationDashboard
-from .components.management import ManagementDashboard
+from .visualization import FileTypeBar
 
 
 class MainWindow(QMainWindow):
@@ -27,10 +34,10 @@ class MainWindow(QMainWindow):
 
         # Set window properties
         self.setWindowTitle("File System Analyzer")
-        
+
         # Apply modern theme
         theme_manager.apply_theme("light")
-        
+
         # Initialize state
         self.current_scan_path = ""
 
@@ -94,7 +101,7 @@ class MainWindow(QMainWindow):
         self.charts_layout.setContentsMargins(0, 0, 0, 0)
         self.visualization_dashboard = VisualizationDashboard()
         self.charts_layout.addWidget(self.visualization_dashboard)
-        
+
         # Setup management tab with smart file management dashboard
         self.management_layout = QVBoxLayout(self.management_tab)
         self.management_layout.setContentsMargins(0, 0, 0, 0)
@@ -128,11 +135,11 @@ class MainWindow(QMainWindow):
         self.status_bar.addWidget(self.status_label)
 
         # Connect signals
-        self.directory_tree.directory_selected.connect(
-            self.on_directory_selected)
+        self.directory_tree.directory_selected.connect(self.on_directory_selected)
         self.file_type_bar.bar_clicked.connect(self.on_file_type_clicked)
         self.visualization_dashboard.drill_down_requested.connect(
-            self.on_dashboard_drill_down)
+            self.on_dashboard_drill_down
+        )
 
         # Initial status message
         self.update_status("Ready - Select a directory to analyze")
@@ -161,11 +168,11 @@ class MainWindow(QMainWindow):
 
     def on_dashboard_drill_down(self, path, filter_data):
         """Handler for dashboard drill-down requests."""
-        if filter_data.get('type') == 'file_type':
+        if filter_data.get("type") == "file_type":
             # Filter by file type
-            file_type = filter_data.get('value', '')
+            file_type = filter_data.get("value", "")
             self.search_input.setText(file_type)
-        elif filter_data.get('type') == 'directory':
+        elif filter_data.get("type") == "directory":
             # Navigate to directory (future implementation)
             pass
 

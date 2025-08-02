@@ -1,8 +1,12 @@
-pathlib==1.0.1
-PyQt6==6.8.1
-PyQt6-Qt6==6.8.2
-PyQt6_sip==13.10.0
-pyqtgraph>=0.13.0
-ruff
-isort
-pytest
+# FileAnalyzer - Smart File Management
+# Core dependencies for running the application
+
+# GUI Framework
+PyQt6==6.9.1
+PyQt6-Qt6==6.9.1
+PyQt6-sip==13.10.2
+
+# Development dependencies (optional)
+ruff>=0.1.0
+isort>=5.12.0
+pytest>=7.0.0

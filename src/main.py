@@ -17,7 +17,7 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName("File Analyzer")
     app.setStyle("Fusion")
-    
+
     # Apply modern theme
     theme_manager.apply_theme("light")
 

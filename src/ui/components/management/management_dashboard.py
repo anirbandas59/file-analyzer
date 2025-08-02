@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
 # File: src/ui/components/management/management_dashboard.py
 
-from typing import Dict, List, Optional
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
-    QPushButton,
-    QScrollArea,
-    QSplitter,
     QStackedWidget,
-    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -176,7 +171,7 @@ class ManagementOverview(QWidget):
         self.duplicates_stat = duplicates_stat
         self.savings_stat = savings_stat
 
-    def update_stats(self, stats: Dict):
+    def update_stats(self, stats: dict):
         """Update the quick statistics display."""
         self.files_stat.update_value(str(stats.get("total_files", 0)))
         self.duplicates_stat.update_value(str(stats.get("duplicate_groups", 0)))
@@ -348,7 +343,7 @@ class ManagementDashboard(QWidget):
         self.current_tool_label.setText("Smart File Management")
         self.back_button.setVisible(False)
 
-    def update_data(self, files: List[Dict], directory_path: str = ""):
+    def update_data(self, files: list[dict], directory_path: str = ""):
         """
         Update the dashboard with new file data.
 
@@ -381,7 +376,7 @@ class ManagementDashboard(QWidget):
             # Reset stats
             self.overview.update_stats({"total_files": len(files)})
 
-    def get_current_tool(self) -> Optional[str]:
+    def get_current_tool(self) -> str | None:
         """Get the currently active tool name."""
         current_widget = self.stacked_widget.currentWidget()
 
@@ -403,7 +398,7 @@ class ManagementDashboard(QWidget):
             return len(self.duplicate_finder.duplicate_groups) > 0
         return False
 
-    def get_management_summary(self) -> Dict:
+    def get_management_summary(self) -> dict:
         """Get overall management summary statistics."""
         summary = {
             "total_files": len(self.current_files),

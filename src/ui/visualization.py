@@ -4,11 +4,10 @@
 import math
 from collections import defaultdict
 
-from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QBrush, QColor, QPainter, QPen
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt6.QtCore import QRect, Qt, pyqtSignal
+from PyQt6.QtGui import QPainter
+from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
-from src.utils.file_utils import format_size
 from .themes.styles import ModernTheme
 
 
@@ -43,7 +42,7 @@ class FileTypeBar(QWidget):
             "DLL": 2000000,
             "PDF": 500000,
             "DOC": 200000,
-            "OTHER": 1000000
+            "OTHER": 1000000,
         }
 
     def update_data(self, file_list):
@@ -59,15 +58,14 @@ class FileTypeBar(QWidget):
 
         # Calculate total size for each file type
         for file in file_list:
-            file_type = file['type']
-            size = file['size']
+            file_type = file["type"]
+            size = file["size"]
 
             self.data[file_type] += size
             self.total_size += size
 
         # Sort and limit to top 10 file types
-        sorted_types = sorted(
-            self.data.items(), key=lambda x: x[1], reverse=True)
+        sorted_types = sorted(self.data.items(), key=lambda x: x[1], reverse=True)
 
         # If we have more than 10 types, combine the smallest into "OTHER"
         if len(sorted_types) > 10:
@@ -92,13 +90,13 @@ class FileTypeBar(QWidget):
             painter.fillRect(self.rect(), ModernTheme.LIGHT_GRAY)
             painter.setPen(ModernTheme.DARK_GRAY)
             painter.drawText(
-                self.rect(), Qt.AlignmentFlag.AlignCenter, "No data available")
+                self.rect(), Qt.AlignmentFlag.AlignCenter, "No data available"
+            )
             return
 
         # Use test data if no real data is available
         data = self.data if self.data else self.test_data
-        total = self.total_size if self.total_size else sum(
-            self.test_data.values())
+        total = self.total_size if self.total_size else sum(self.test_data.values())
 
         # Draw the segments
         x = 0
@@ -112,8 +110,7 @@ class FileTypeBar(QWidget):
             sorted(data.items(), key=lambda x: x[1], reverse=True)
         ):
             # Calculate the width of this segment
-            segment_width = math.floor(
-                (size / total) * width) if total > 0 else 0
+            segment_width = math.floor((size / total) * width) if total > 0 else 0
 
             # If this is the last segment, make sure it extends to the end
             if i == len(data) - 1:
@@ -126,11 +123,13 @@ class FileTypeBar(QWidget):
             painter.fillRect(x, 0, segment_width, height, color)
 
             # Store segment info for mouse events
-            self.segments.append({
-                'type': file_type,
-                'rect': QRect(x, 0, segment_width, height),
-                'size': size
-            })
+            self.segments.append(
+                {
+                    "type": file_type,
+                    "rect": QRect(x, 0, segment_width, height),
+                    "size": size,
+                }
+            )
 
             # Draw the text if the segment is wide enough
             if segment_width > 60:
@@ -138,8 +137,7 @@ class FileTypeBar(QWidget):
                 # Calculate text width and see if it fits
                 text = f"{file_type} ({size / total:.1%})"
                 text_rect = QRect(x + 5, 0, segment_width - 10, height)
-                painter.drawText(
-                    text_rect, Qt.AlignmentFlag.AlignVCenter, text)
+                painter.drawText(text_rect, Qt.AlignmentFlag.AlignVCenter, text)
 
             # Move x for the next segment
             x += segment_width
@@ -148,10 +146,10 @@ class FileTypeBar(QWidget):
         """
         Handle mouse clicks to identify which segment was clicked.
         """
-        if not hasattr(self, 'segments'):
+        if not hasattr(self, "segments"):
             return
 
         for segment in self.segments:
-            if segment['rect'].contains(event.position().toPoint()):
-                self.bar_clicked.emit(segment['type'])
+            if segment["rect"].contains(event.position().toPoint()):
+                self.bar_clicked.emit(segment["type"])
                 break

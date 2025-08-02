@@ -1,17 +1,53 @@
 [project]
 name = "fileanalyzer"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Smart File Management - Duplicate Detection, Large File Analysis, and Archival Recommendations"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
-    "isort>=6.0.1",
-    "pathlib==1.0.1",
-    "pyqt6==6.8.1",
-    "pyqt6-qt6==6.8.2",
-    "pyqt6-sip==13.10.0",
-    "pyqtgraph>=0.13.0",
-    "pytest>=8.4.1",
-    "ruff>=0.12.7",
-    "setuptools>=80.9.0",
+    "pyqt6==6.9.1",
+    "pyqt6-qt6==6.9.1",
+    "pyqt6-sip==13.10.2",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.12.7",
+    "isort>=5.12.0",
+    "pytest>=7.0.0",
+    "pytest-qt>=4.2.0",
+    "black>=22.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/fileanalyzer/FileAnalyzer"
+Repository = "https://github.com/fileanalyzer/FileAnalyzer.git"
+Issues = "https://github.com/fileanalyzer/FileAnalyzer/issues"
+
+[project.scripts]
+fileanalyzer = "src.main:main"
+file-analyzer = "src.main:main"
+
+[project.gui-scripts]
+fileanalyzer-gui = "src.main:main"
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "RUF"]
+extend-select = ["I", "N", "UP", "RUF"]
+ignore = ["E501", "N802"]  # Line too long, function name should be lowercase (PyQt methods)
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.isort]
+profile = "black"
+line_length = 88

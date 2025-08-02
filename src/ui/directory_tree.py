@@ -4,7 +4,7 @@
 import os
 from pathlib import Path
 
-from PyQt6.QtCore import QDir, QModelIndex, Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QStandardItem, QStandardItemModel
 from PyQt6.QtWidgets import QAbstractItemView, QTreeView
 
@@ -24,8 +24,7 @@ class DirectoryTreeView(QTreeView):
         self.setModel(self.model)
 
         # Configure the tree view
-        self.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setHeaderHidden(False)
 
@@ -119,5 +118,5 @@ class DirectoryTreeView(QTreeView):
             return None
 
         # We only care about the first column
-        index = [idx for idx in indexes if idx.column() == 0][0]
+        index = next(idx for idx in indexes if idx.column() == 0)
         return self.path_dict.get(index)

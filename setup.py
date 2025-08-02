@@ -51,8 +51,9 @@ setup(
     },
     include_package_data=True,
     install_requires=[
-        "PyQt6>=6.4.0",
-        "PyQt6-Qt6>=6.4.0",
+        "PyQt6==6.9.1",
+        "PyQt6-Qt6==6.9.1", 
+        "PyQt6-sip==13.10.2",
     ],
     extras_require={
         "dev": [
