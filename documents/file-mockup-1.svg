@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f5f5f5"/>
+  
+  <!-- Window frame -->
+  <rect x="10" y="10" width="780" height="580" rx="5" ry="5" fill="white" stroke="#ddd" stroke-width="1"/>
+  
+  <!-- Title bar -->
+  <rect x="10" y="10" width="780" height="40" rx="5" ry="5" fill="#3498db"/>
+  <text x="30" y="35" font-family="Arial" font-size="16" fill="white">File System Analyzer</text>
+  
+  <!-- Control buttons -->
+  <circle cx="755" cy="30" r="8" fill="#e74c3c"/>
+  <circle cx="730" cy="30" r="8" fill="#f1c40f"/>
+  <circle cx="705" cy="30" r="8" fill="#2ecc71"/>
+  
+  <!-- Left panel - Directory tree -->
+  <rect x="20" y="60" width="220" height="520" rx="3" ry="3" fill="#f8f9fa" stroke="#ddd" stroke-width="1"/>
+  <text x="30" y="80" font-family="Arial" font-size="14" font-weight="bold" fill="#333">Directories</text>
+  
+  <!-- Directory items -->
+  <rect x="25" y="90" width="210" height="30" rx="3" ry="3" fill="#e6f7ff"/>
+  <text x="45" y="110" font-family="Arial" font-size="12" fill="#333">C:\Users\hostname</text>
+  
+  <!-- Sample folder structure -->
+  <text x="45" y="140" font-family="Arial" font-size="12" fill="#333">↳ Downloads</text>
+  <text x="45" y="165" font-family="Arial" font-size="12" fill="#333">↳ Documents</text>
+  <text x="45" y="190" font-family="Arial" font-size="12" fill="#333">↳ Pictures</text>
+  <text x="45" y="215" font-family="Arial" font-size="12" fill="#333">↳ .vscode</text>
+  <rect x="55" y="225" width="170" height="25" rx="3" ry="3" fill="#e6f7ff"/>
+  <text x="65" y="242" font-family="Arial" font-size="12" font-weight="bold" fill="#1890ff">↳ extensions</text>
+  <text x="75" y="267" font-family="Arial" font-size="11" fill="#666">↳ redhat.vscode-openshift</text>
+  <text x="75" y="287" font-family="Arial" font-size="11" fill="#666">↳ ms-python.python</text>
+  
+  <!-- Scan button -->
+  <rect x="30" y="520" width="200" height="40" rx="5" ry="5" fill="#3498db"/>
+  <text x="110" y="545" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Scan</text>
+  
+  <!-- Right panel - Main content area -->
+  <rect x="250" y="60" width="540" height="520" rx="3" ry="3" fill="white" stroke="#ddd" stroke-width="1"/>
+  
+  <!-- Tab navigation -->
+  <rect x="250" y="60" width="540" height="40" fill="#f8f9fa" stroke="#ddd" stroke-width="1"/>
+  <rect x="260" y="60" width="100" height="40" fill="white"/>
+  <text x="310" y="85" font-family="Arial" font-size="13" fill="#333" text-anchor="middle">Files</text>
+  <rect x="360" y="60" width="100" height="40" fill="#f8f9fa"/>
+  <text x="410" y="85" font-family="Arial" font-size="13" fill="#666" text-anchor="middle">Charts</text>
+  
+  <!-- Search bar -->
+  <rect x="550" y="65" width="230" height="30" rx="15" ry="15" fill="white" stroke="#ddd" stroke-width="1"/>
+  <text x="580" y="85" font-family="Arial" font-size="12" fill="#999">Search files...</text>
+  <circle cx="565" cy="80" r="7" fill="none" stroke="#999" stroke-width="1.5"/>
+  <line x1="570" y1="85" x2="575" y2="90" stroke="#999" stroke-width="1.5"/>
+  
+  <!-- File list header -->
+  <rect x="260" y="110" width="520" height="30" fill="#f8f9fa"/>
+  <text x="280" y="130" font-family="Arial" font-size="12" font-weight="bold" fill="#333">Name</text>
+  <text x="500" y="130" font-family="Arial" font-size="12" font-weight="bold" fill="#333">Size</text>
+  <text x="580" y="130" font-family="Arial" font-size="12" font-weight="bold" fill="#333">Modified</text>
+  <text x="700" y="130" font-family="Arial" font-size="12" font-weight="bold" fill="#333">Type</text>
+  
+  <!-- File entries -->
+  <rect x="260" y="140" width="520" height="40" fill="white" stroke="#f5f5f5" stroke-width="1"/>
+  <text x="280" y="165" font-family="Arial" font-size="12" fill="#333">oc.exe</text>
+  <text x="500" y="165" font-family="Arial" font-size="12" fill="#333">128.74 MB</text>
+  <text x="580" y="165" font-family="Arial" font-size="12" fill="#333">2023-05-12</text>
+  <text x="700" y="165" font-family="Arial" font-size="12" fill="#333">EXE</text>
+  
+  <rect x="260" y="180" width="520" height="40" fill="#f9f9f9" stroke="#f5f5f5" stroke-width="1"/>
+  <text x="280" y="205" font-family="Arial" font-size="12" fill="#333">oc.exe</text>
+  <text x="500" y="205" font-family="Arial" font-size="12" fill="#333">123.42 MB</text>
+  <text x="580" y="205" font-family="Arial" font-size="12" fill="#333">2023-05-10</text>
+  <text x="700" y="205" font-family="Arial" font-size="12" fill="#333">EXE</text>
+  
+  <rect x="260" y="220" width="520" height="40" fill="white" stroke="#f5f5f5" stroke-width="1"/>
+  <text x="280" y="245" font-family="Arial" font-size="12" fill="#333">oc.exe</text>
+  <text x="500" y="245" font-family="Arial" font-size="12" fill="#333">120.17 MB</text>
+  <text x="580" y="245" font-family="Arial" font-size="12" fill="#333">2023-04-28</text>
+  <text x="700" y="245" font-family="Arial" font-size="12" fill="#333">EXE</text>
+  
+  <!-- More file entries -->
+  <rect x="260" y="260" width="520" height="220" fill="#fafafa" stroke="#f5f5f5" stroke-width="1"/>
+  <text x="460" y="370" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">Loading more files...</text>
+  
+  <!-- Status bar -->
+  <rect x="250" y="540" width="540" height="40" fill="#f8f9fa" stroke="#ddd" stroke-width="1"/>
+  <text x="270" y="565" font-family="Arial" font-size="12" fill="#333">120,532 files</text>
+  <text x="380" y="565" font-family="Arial" font-size="12" fill="#333">6.87 GB total</text>
+  <text x="670" y="565" font-family="Arial" font-size="12" fill="#333">Scan completed in 3.2s</text>
+  
+  <!-- Size visualization bar -->
+  <rect x="260" y="495" width="520" height="30" rx="3" ry="3" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+  <rect x="260" y="495" width="320" height="30" rx="3" ry="3" fill="#3498db" opacity="0.7"/>
+  <rect x="580" y="495" width="120" height="30" rx="0" ry="0" fill="#2ecc71" opacity="0.7"/>
+  <rect x="700" y="495" width="80" height="30" rx="0" ry="0" fill="#e74c3c" opacity="0.7"/>
+  <text x="300" y="515" font-family="Arial" font-size="12" fill="white">EXE Files (60%)</text>
+  <text x="610" y="515" font-family="Arial" font-size="12" fill="white">DLL (20%)</text>
+  <text x="720" y="515" font-family="Arial" font-size="12" fill="white">Other</text>
+  
+  <!-- View options -->
+  <rect x="690" y="110" width="90" height="25" rx="3" ry="3" fill="white" stroke="#ddd" stroke-width="1"/>
+  <text x="710" y="127" font-family="Arial" font-size="12" fill="#666">View: List</text>
+  <text x="778" y="127" font-family="Arial" font-size="12" fill="#666">▼</text>
+</svg>
