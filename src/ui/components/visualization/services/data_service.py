@@ -67,7 +67,7 @@ class VisualizationDataService:
     def get_file_size_distribution(self) -> FileDistributionData:
         """Get file size distribution data for bar charts."""
         from src.utils.logger import logger
-        
+
         if not self.current_files:
             logger.debug("get_file_size_distribution: No files to analyze")
             return FileDistributionData([], [], [], [])
@@ -101,7 +101,7 @@ class VisualizationDataService:
             count / total_files * 100 if total_files > 0 else 0
             for count in range_counts
         ]
-        
+
         total_size_files = sum(range_counts)
         logger.debug(f"Size distribution: {total_size_files} files categorized")
         logger.debug(f"Size distribution counts: {range_counts}")
@@ -123,7 +123,7 @@ class VisualizationDataService:
     def get_file_age_distribution(self) -> FileAgeData:
         """Get file age distribution data."""
         from src.utils.logger import logger
-        
+
         if not self.current_files:
             logger.debug("get_file_age_distribution: No files to analyze")
             return FileAgeData([], [], [], [])
@@ -150,13 +150,13 @@ class VisualizationDataService:
         for file in self.current_files:
             try:
                 file_modified = file["modified"]
-                
+
                 # Validate that we have a datetime object
                 if not isinstance(file_modified, datetime):
                     logger.warning(f"File age analysis: Invalid datetime type for file {file.get('name', 'unknown')}: {type(file_modified)}")
                     error_files += 1
                     continue
-                
+
                 age = now - file_modified
                 processed_files += 1
 
@@ -165,7 +165,7 @@ class VisualizationDataService:
                         range_counts[i] += 1
                         range_sizes[i] += file["size"]
                         break
-                        
+
             except Exception as e:
                 logger.error(f"Error processing file age for {file.get('name', 'unknown')}: {e}")
                 error_files += 1
@@ -176,7 +176,7 @@ class VisualizationDataService:
             count / total_files * 100 if total_files > 0 else 0
             for count in range_counts
         ]
-        
+
         total_age_files = sum(range_counts)
         logger.debug(f"File age distribution: {processed_files} processed, {error_files} errors, {total_age_files} categorized")
         logger.debug(f"Age distribution counts: {range_counts}")

@@ -13,7 +13,9 @@ from PyQt6.QtGui import QPixmap
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from src.ui.main_window import MainWindow
+from src.ui.themes.icon_manager import icon_manager
 from src.ui.themes.theme_manager import theme_manager
+from src.ui.themes.theme_provider import theme_provider
 from src.utils.settings import SettingsManager
 
 
@@ -363,4 +365,228 @@ class TestUIVisualRegression:
             # Verify window resized correctly
             assert window.width() == width
             assert window.height() == height
+
+    @patch('src.utils.settings.Path.home')
+    def test_charts_tab_dark_theme_visual(self, mock_home, qtbot):
+        """Test Charts tab visual appearance in dark theme."""
+        mock_home.return_value = Path(self.temp_dir)
+
+        window = MainWindow()
+        qtbot.addWidget(window)
+        window.show()
+
+        # Apply dark theme
+        theme_manager.apply_theme("dark")
+        qtbot.wait(500)  # Wait for theme to apply
+
+        # Switch to Charts tab
+        tab_widget = window.tab_widget
+        tab_widget.setCurrentIndex(1)  # Charts is index 1
+        qtbot.wait(300)
+
+        # Capture Charts tab screenshot
+        screenshot = window.grab()
+        self.save_reference_image(screenshot, "charts_tab_dark_theme")
+
+        # Verify screenshot was saved
+        screenshots_dir = Path(__file__).parent / "screenshots"
+        assert len(os.listdir(screenshots_dir)) > 0
+
+    @patch('src.utils.settings.Path.home')
+    def test_management_tab_dark_theme_visual(self, mock_home, qtbot):
+        """Test Management tab visual appearance in dark theme."""
+        mock_home.return_value = Path(self.temp_dir)
+
+        window = MainWindow()
+        qtbot.addWidget(window)
+        window.show()
+
+        # Apply dark theme
+        theme_manager.apply_theme("dark")
+        qtbot.wait(500)  # Wait for theme to apply
+
+        # Switch to Management tab
+        tab_widget = window.tab_widget
+        tab_widget.setCurrentIndex(2)  # Management is index 2
+        qtbot.wait(300)
+
+        # Capture Management tab screenshot
+        screenshot = window.grab()
+        self.save_reference_image(screenshot, "management_tab_dark_theme")
+
+        # Verify screenshot was saved
+        screenshots_dir = Path(__file__).parent / "screenshots"
+        assert len(os.listdir(screenshots_dir)) > 0
+
+    def test_new_theme_system_integration(self, qtbot):
+        """Test the new theme system integration and components."""
+        # Test theme provider
+        assert theme_provider.current_theme in ["light", "dark"]
+
+        # Test theme switching
+        original_theme = theme_provider.current_theme
+        new_theme = "dark" if original_theme == "light" else "light"
+
+        theme_provider.set_theme(new_theme)
+        assert theme_provider.current_theme == new_theme
+
+        # Test palette access
+        palette = theme_provider.current_palette
+        assert palette.primary is not None
+        assert palette.background is not None
+        assert palette.text_primary is not None
+
+        # Test chart colors
+        chart_colors = [
+            palette.chart_primary,
+            palette.chart_secondary,
+            palette.chart_tertiary,
+            palette.chart_quaternary
+        ]
+        assert all(color is not None for color in chart_colors)
+
+        # Test icon system
+        available_icons = icon_manager.get_available_icons()
+        assert len(available_icons) > 0
+        assert "folder" in available_icons
+        assert "file" in available_icons
+
+        # Test icon creation
+        icon = icon_manager.get_icon("folder", 24)
+        assert icon is not None
+
+        # Restore original theme
+        theme_provider.set_theme(original_theme)
+
+    @pytest.mark.parametrize("theme", ["light", "dark"])
+    def test_themed_components_visual(self, qtbot, theme):
+        """Test themed components in both light and dark themes."""
+        from src.ui.components.themed.themed_widgets import (
+            ThemedButton,
+            ThemedCard,
+            ThemedLabel,
+            ThemedStatsCard,
+        )
+
+        # Apply theme
+        theme_provider.set_theme(theme)
+
+        # Create test widgets
+        button = ThemedButton("Test Button", "primary")
+        qtbot.addWidget(button)
+        button.show()
+        qtbot.wait(100)
+
+        card = ThemedCard("card")
+        qtbot.addWidget(card)
+        card.show()
+        qtbot.wait(100)
+
+        label = ThemedLabel("Test Label", "title")
+        qtbot.addWidget(label)
+        label.show()
+        qtbot.wait(100)
+
+        stats_card = ThemedStatsCard("Files", "1,234", "folder")
+        qtbot.addWidget(stats_card)
+        stats_card.show()
+        qtbot.wait(100)
+
+        # Capture screenshots
+        button_screenshot = button.grab()
+        self.save_reference_image(button_screenshot, f"themed_button_{theme}")
+
+        card_screenshot = card.grab()
+        self.save_reference_image(card_screenshot, f"themed_card_{theme}")
+
+        label_screenshot = label.grab()
+        self.save_reference_image(label_screenshot, f"themed_label_{theme}")
+
+        stats_screenshot = stats_card.grab()
+        self.save_reference_image(stats_screenshot, f"themed_stats_card_{theme}")
+
+    def test_icon_system_visual(self, qtbot):
+        """Test the icon system with different sizes and themes."""
+        from src.ui.themes.icon_manager import IconWidget
+
+        icon_names = ["folder", "file", "chart", "settings", "refresh"]
+        sizes = [16, 24, 32, 48]
+        themes = ["light", "dark"]
+
+        for theme in themes:
+            theme_provider.set_theme(theme)
+
+            for icon_name in icon_names:
+                for size in sizes:
+                    icon_widget = IconWidget(icon_name, size)
+                    qtbot.addWidget(icon_widget)
+                    icon_widget.show()
+                    qtbot.wait(50)
+
+                    screenshot = icon_widget.grab()
+                    self.save_reference_image(
+                        screenshot,
+                        f"icon_{icon_name}_{size}px_{theme}"
+                    )
+
+    def test_color_contrast_validation(self, qtbot):
+        """Test color contrast ratios for accessibility."""
+        themes = ["light", "dark"]
+
+        for theme in themes:
+            theme_provider.set_theme(theme)
+            palette = theme_provider.current_palette
+
+            # Test text on background contrast
+            bg = palette.background
+            text = palette.text_primary
+
+            # Simple contrast check (not full WCAG calculation)
+            bg_luminance = (bg.red() * 0.299 + bg.green() * 0.587 + bg.blue() * 0.114) / 255
+            text_luminance = (text.red() * 0.299 + text.green() * 0.587 + text.blue() * 0.114) / 255
+
+            # Ensure there's reasonable contrast
+            contrast_ratio = abs(bg_luminance - text_luminance)
+            assert contrast_ratio > 0.3, f"Poor contrast in {theme} theme: {contrast_ratio}"
+
+            # Test that primary colors are different from background
+            primary_luminance = (palette.primary.red() * 0.299 +
+                               palette.primary.green() * 0.587 +
+                               palette.primary.blue() * 0.114) / 255
+
+            primary_contrast = abs(bg_luminance - primary_luminance)
+            assert primary_contrast > 0.2, f"Poor primary contrast in {theme} theme"
+
+    @patch('src.utils.settings.Path.home')
+    def test_theme_switching_performance(self, mock_home, qtbot):
+        """Test theme switching performance and visual updates."""
+        mock_home.return_value = Path(self.temp_dir)
+
+        window = MainWindow()
+        qtbot.addWidget(window)
+        window.show()
+        qtbot.wait(300)
+
+        # Measure theme switching time
+        import time
+
+        themes = ["light", "dark", "light"]
+        switch_times = []
+
+        for theme in themes:
+            start_time = time.time()
+            theme_manager.apply_theme(theme)
+            qtbot.wait(100)  # Allow UI to update
+            end_time = time.time()
+
+            switch_time = end_time - start_time
+            switch_times.append(switch_time)
+
+            # Capture screenshot after theme switch
+            screenshot = window.grab()
+            self.save_reference_image(screenshot, f"theme_switch_performance_{theme}")
+
+        # Verify theme switching is reasonably fast (< 1 second)
+        avg_switch_time = sum(switch_times) / len(switch_times)
+        assert avg_switch_time < 1.0, f"Theme switching too slow: {avg_switch_time:.2f}s"
 

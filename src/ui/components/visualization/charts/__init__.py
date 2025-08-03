@@ -8,9 +8,9 @@ from .tree_chart import DirectoryTreeChart
 
 __all__ = [
     "BaseChart",
-    "InteractiveChart", 
-    "FileTypePieChart",
-    "SizeDistributionChart",
-    "FileAgeChart",
     "DirectoryTreeChart",
+    "FileAgeChart",
+    "FileTypePieChart",
+    "InteractiveChart",
+    "SizeDistributionChart",
 ]

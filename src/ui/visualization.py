@@ -5,7 +5,7 @@ import math
 from collections import defaultdict
 
 from PyQt6.QtCore import QRect, Qt, pyqtSignal
-from PyQt6.QtGui import QPainter, QColor
+from PyQt6.QtGui import QColor, QPainter
 from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
 from .themes.styles import FILE_COLORS, ModernTheme

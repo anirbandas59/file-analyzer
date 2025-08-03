@@ -12,7 +12,7 @@ from PyQt6.QtCore import (
 from PyQt6.QtWidgets import QAbstractItemView, QHeaderView, QTableView
 
 from src.models.file_system_model import FileSystemTableModel
-from src.utils.file_utils import format_size, scan_directory
+from src.utils.file_utils import scan_directory
 from src.utils.logger import logger
 
 
@@ -108,15 +108,15 @@ class ScannerThread(QThread):
         try:
             logger.debug(f"Scanner thread started for: {self.path}")
             start_time = time.time()
-            
+
             file_list, total_size = scan_directory(self.path, self.full_scan)
             scan_time = time.time() - start_time
-            
+
             logger.debug(f"Scan completed: {len(file_list)} files, {scan_time:.3f}s")
 
             # Emit the signal with results
             self.files_ready.emit(file_list, total_size, scan_time)
-            
+
         except Exception as e:
             logger.error(f"Error during directory scan: {self.path}", e)
             # Emit empty results on error

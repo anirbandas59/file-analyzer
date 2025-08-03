@@ -99,11 +99,11 @@ class ManagementOverview(QWidget):
 
         # Title
         title_label = QLabel(title)
+        title_label.setProperty("class", "title")
         title_label.setStyleSheet(f"""
         QLabel {{
             font-size: {Typography.FONT_LG};
             font-weight: {Typography.WEIGHT_BOLD};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
             background: transparent;
             border: none;
         }}
@@ -112,9 +112,9 @@ class ManagementOverview(QWidget):
         # Description
         desc_label = QLabel(description)
         desc_label.setWordWrap(True)
+        desc_label.setProperty("class", "subtitle")
         desc_label.setStyleSheet(f"""
         QLabel {{
-            color: {ModernTheme.DARK_GRAY.name()};
             font-size: {Typography.FONT_MD};
             background: transparent;
             border: none;
@@ -124,9 +124,9 @@ class ManagementOverview(QWidget):
         # Details
         details_label = QLabel(details)
         details_label.setWordWrap(True)
+        details_label.setProperty("class", "subtitle")
         details_label.setStyleSheet(f"""
         QLabel {{
-            color: {ModernTheme.DARK_GRAY.name()};
             font-size: {Typography.FONT_SM};
             font-style: italic;
             background: transparent;

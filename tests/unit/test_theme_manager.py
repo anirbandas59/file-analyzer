@@ -9,7 +9,8 @@ from PyQt6.QtWidgets import QApplication
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from src.ui.themes.theme_manager import ThemeManager
+from src.ui.themes.theme_manager import ThemeManager, theme_manager
+from src.ui.themes.theme_provider import theme_provider
 
 
 class TestThemeManager(unittest.TestCase):
@@ -24,27 +25,35 @@ class TestThemeManager(unittest.TestCase):
 
     def setUp(self):
         """Set up each test."""
-        self.theme_manager = ThemeManager()
+        # Safely create theme manager without triggering signals
+        with patch.object(theme_provider, 'apply_theme_to_app'):
+            self.theme_manager = ThemeManager()
+            # Reset to light theme for consistent testing
+            theme_provider._current_theme = "light"
 
     def test_initialization(self):
         """Test ThemeManager initialization."""
         self.assertEqual(self.theme_manager.current_theme, "light")
-        self.assertIsNotNone(self.theme_manager.themes_dir)
+        self.assertIsNotNone(theme_provider.current_palette)
 
     def test_apply_light_theme(self):
         """Test applying light theme."""
         self.theme_manager.apply_theme("light")
         self.assertEqual(self.theme_manager.current_theme, "light")
+        self.assertEqual(theme_provider.current_theme, "light")
 
     def test_apply_dark_theme(self):
         """Test applying dark theme."""
         self.theme_manager.apply_theme("dark")
         self.assertEqual(self.theme_manager.current_theme, "dark")
+        self.assertEqual(theme_provider.current_theme, "dark")
 
-    def test_apply_invalid_theme_defaults_to_light(self):
-        """Test that invalid theme names default to light theme."""
+    def test_apply_invalid_theme_no_crash(self):
+        """Test that invalid theme names don't crash."""
+        original_theme = self.theme_manager.current_theme
         self.theme_manager.apply_theme("invalid_theme")
-        # Should not crash and should handle gracefully
+        # Should remain unchanged for invalid themes
+        self.assertEqual(self.theme_manager.current_theme, original_theme)
 
     def test_get_stylesheet_light(self):
         """Test getting light theme stylesheet."""
@@ -109,8 +118,8 @@ class TestThemeManager(unittest.TestCase):
         light_stylesheet = self.theme_manager.get_stylesheet("light")
         dark_stylesheet = self.theme_manager.get_stylesheet("dark")
 
-        # Should contain common CSS elements
-        common_elements = ["QWidget", "color", "background"]
+        # Should contain common CSS elements from new design system
+        common_elements = ["QMainWindow", "QWidget", "color", "background-color", "QPushButton", "QLabel"]
 
         for element in common_elements:
             self.assertIn(element, light_stylesheet)
@@ -126,20 +135,71 @@ class TestThemeManager(unittest.TestCase):
             self.theme_manager.apply_theme("light")
             self.assertEqual(self.theme_manager.current_theme, "light")
 
-    def test_theme_manager_singleton_like_behavior(self):
-        """Test that theme manager can be used across the application."""
-        # Create multiple instances (though not enforced singleton)
-        tm1 = ThemeManager()
-        tm2 = ThemeManager()
+    def test_new_design_system_integration(self):
+        """Test integration with new design system."""
+        # Test color access
+        color = self.theme_manager.get_color("PRIMARY")
+        self.assertIsNotNone(color)
+        
+        # Test chart colors
+        chart_colors = self.theme_manager.get_chart_colors()
+        self.assertIsInstance(chart_colors, list)
+        self.assertGreater(len(chart_colors), 0)
+        
+        # Test icon access
+        icon = self.theme_manager.get_icon("folder", 24)
+        self.assertIsNotNone(icon)
 
-        # Both should be able to apply themes
-        tm1.apply_theme("dark")
-        tm2.apply_theme("light")
+    def test_theme_provider_compatibility(self):
+        """Test compatibility with new theme provider."""
+        # Test that theme manager uses theme provider
+        self.theme_manager.apply_theme("dark")
+        self.assertEqual(theme_provider.current_theme, "dark")
+        
+        # Test palette access
+        palette = theme_provider.current_palette
+        self.assertIsNotNone(palette.primary)
+        self.assertIsNotNone(palette.background)
+        self.assertIsNotNone(palette.text_primary)
 
-        # Last applied should be current for both
-        self.assertEqual(tm2.current_theme, "light")
+    def test_chart_theme_integration(self):
+        """Test chart theming integration."""
+        # Should be able to apply chart theme without errors
+        self.theme_manager.apply_chart_theme()
+        
+        # Test switching themes updates chart theming
+        self.theme_manager.apply_theme("dark")
+        self.theme_manager.apply_theme("light")
+
+    def test_toggle_theme(self):
+        """Test theme toggling functionality."""
+        original_theme = self.theme_manager.current_theme
+        
+        self.theme_manager.toggle_theme()
+        new_theme = self.theme_manager.current_theme
+        
+        # Should have switched
+        self.assertNotEqual(original_theme, new_theme)
+        
+        # Toggle back
+        self.theme_manager.toggle_theme()
+        final_theme = self.theme_manager.current_theme
+        
+        # Should be back to original
+        self.assertEqual(original_theme, final_theme)
+
+    def test_backward_compatibility(self):
+        """Test backward compatibility with old theme manager interface."""
+        # Old methods should still work
+        self.assertIsNotNone(self.theme_manager.get_current_theme())
+        
+        # Color mapping should work
+        primary = self.theme_manager.get_color("PRIMARY")
+        background = self.theme_manager.get_color("BACKGROUND")
+        
+        self.assertIsNotNone(primary)
+        self.assertIsNotNone(background)
 
 
 if __name__ == '__main__':
     unittest.main()
-

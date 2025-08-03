@@ -12,13 +12,15 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ..themes.styles import BorderRadius, ModernTheme, Spacing, Typography
+from ..themes.design_system import Spacing
+from ..themes.theme_provider import theme_provider
 
 
 class CardWidget(QFrame):
     """
     A modern card widget with rounded corners, shadow, and consistent theming.
     Provides a clean container for grouping related content.
+    Uses the new design system for theming.
     """
 
     def __init__(self, parent=None, elevation="md"):
@@ -27,37 +29,50 @@ class CardWidget(QFrame):
         self.elevation = elevation
         self.setup_card()
 
+        # Connect to theme changes
+        theme_provider.theme_changed.connect(self._on_theme_changed)
+
     def setup_card(self):
         """Initialize card styling and shadow effects."""
         # Set frame properties
         self.setFrameShape(QFrame.Shape.NoFrame)
 
-        # Set object name for CSS styling
-        self.setObjectName("CardWidget")
+        # Use new design system classes
+        self.setProperty("class", "card")
 
         # Add shadow effect based on elevation
         self.add_shadow_effect()
 
+    def _on_theme_changed(self, theme_name: str):
+        """Handle theme changes"""
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.add_shadow_effect()  # Update shadow for new theme
+
     def add_shadow_effect(self):
-        """Add drop shadow based on elevation level."""
+        """Add drop shadow based on elevation level and current theme."""
         shadow = QGraphicsDropShadowEffect()
+
+        # Get theme-appropriate shadow color
+        is_dark_theme = theme_provider.current_theme == "dark"
+        base_opacity = 15 if is_dark_theme else 40
 
         # Configure shadow based on elevation
         if self.elevation == "sm":
             shadow.setBlurRadius(4)
             shadow.setXOffset(0)
             shadow.setYOffset(2)
-            shadow.setColor(QColor(0, 0, 0, 30))
+            shadow.setColor(QColor(0, 0, 0, base_opacity))
         elif self.elevation == "lg":
             shadow.setBlurRadius(12)
             shadow.setXOffset(0)
             shadow.setYOffset(6)
-            shadow.setColor(QColor(0, 0, 0, 60))
+            shadow.setColor(QColor(0, 0, 0, base_opacity + 20))
         else:  # md (default)
             shadow.setBlurRadius(8)
             shadow.setXOffset(0)
             shadow.setYOffset(4)
-            shadow.setColor(QColor(0, 0, 0, 40))
+            shadow.setColor(QColor(0, 0, 0, base_opacity + 10))
 
         self.setGraphicsEffect(shadow)
 
@@ -111,28 +126,13 @@ class TitleCard(CardWidget):
         # Title label
         if self.title_text:
             self.title_label = QLabel(self.title_text)
-            self.title_label.setProperty("class", "title")
-            self.title_label.setStyleSheet(f"""
-            QLabel {{
-                font-size: {Typography.FONT_LG};
-                font-weight: {Typography.WEIGHT_BOLD};
-                background-color: transparent;
-                border: none;
-            }}
-            """)
+            self.title_label.setProperty("class", "heading")
             self.header_layout.addWidget(self.title_label)
 
         # Subtitle label
         if self.subtitle_text:
             self.subtitle_label = QLabel(self.subtitle_text)
-            self.subtitle_label.setProperty("class", "subtitle")
-            self.subtitle_label.setStyleSheet(f"""
-            QLabel {{
-                font-size: {Typography.FONT_SM};
-                background-color: transparent;
-                border: none;
-            }}
-            """)
+            self.subtitle_label.setProperty("class", "caption")
             self.header_layout.addWidget(self.subtitle_label)
 
         # Add separator line
@@ -168,10 +168,14 @@ class TitleCard(CardWidget):
 class StatsCard(CardWidget):
     """
     A specialized card for displaying statistics with value and label.
+    Now uses the new design system for consistent theming.
     """
 
     def __init__(self, title="", value="", unit="", parent=None):
         super().__init__(parent)
+
+        # Use stats-card class for styling
+        self.setProperty("class", "stats-card")
 
         # Setup layout
         layout = QVBoxLayout(self)
@@ -181,15 +185,7 @@ class StatsCard(CardWidget):
         # Value label (large number)
         self.value_label = QLabel(value)
         self.value_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.value_label.setStyleSheet(f"""
-        QLabel {{
-            font-size: {Typography.FONT_XXL};
-            font-weight: {Typography.WEIGHT_BOLD};
-            color: {ModernTheme.PRIMARY.name()};
-            background-color: transparent;
-            border: none;
-        }}
-        """)
+        self.value_label.setObjectName("stats_value")
 
         # Unit label (if provided)
         if unit:
@@ -197,14 +193,7 @@ class StatsCard(CardWidget):
             value_with_unit.addWidget(self.value_label)
 
             unit_label = QLabel(unit)
-            unit_label.setStyleSheet(f"""
-            QLabel {{
-                font-size: {Typography.FONT_MD};
-                color: {ModernTheme.DARK_GRAY.name()};
-                background-color: transparent;
-                border: none;
-            }}
-            """)
+            unit_label.setProperty("class", "caption")
             value_with_unit.addWidget(unit_label)
             value_with_unit.addStretch()
 
@@ -216,14 +205,7 @@ class StatsCard(CardWidget):
         if title:
             self.title_label = QLabel(title)
             self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.title_label.setStyleSheet(f"""
-            QLabel {{
-                font-size: {Typography.FONT_SM};
-                color: {ModernTheme.DARK_GRAY.name()};
-                background-color: transparent;
-                border: none;
-            }}
-            """)
+            self.title_label.setObjectName("stats_label")
             layout.addWidget(self.title_label)
 
     def update_value(self, value, unit=""):

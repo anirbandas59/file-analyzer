@@ -56,7 +56,6 @@ def temp_test_dir():
 
 
 # Visual regression test configuration
-pytest_plugins = ["pytestqt"]
 
 
 def pytest_configure(config):

@@ -11,8 +11,9 @@ This guide provides detailed setup instructions specifically for Windows users, 
 - **Administrator privileges** (for certain file operations)
 
 ### Python Installation
-- **Python 3.10+** is required
+- **Python 3.12+** is required (tested with 3.12.11)
 - Download from the official source: [python.org/downloads/windows](https://www.python.org/downloads/windows/)
+- **PyQt6** and optional dependencies will be installed automatically
 
 ## 🚀 Quick Setup (Recommended)
 
@@ -34,13 +35,14 @@ This guide provides detailed setup instructions specifically for Windows users, 
 ## 🔧 Manual Setup (Advanced Users)
 
 ### Step 1: Install Python
-1. Download Python 3.10+ from [python.org](https://www.python.org/downloads/windows/)
+1. Download Python 3.12+ from [python.org](https://www.python.org/downloads/windows/)
 2. **Important**: Check **"Add Python to PATH"** during installation
 3. Select **"Install for all users"** if you have administrator rights
 4. After installation, verify by opening Command Prompt and running:
    ```cmd
    python --version
    ```
+   Should show Python 3.12.x or later
 
 ### Step 2: Setup FileAnalyzer
 1. Open **Command Prompt** or **PowerShell**
@@ -58,7 +60,11 @@ This guide provides detailed setup instructions specifically for Windows users, 
    ```
 5. Install dependencies:
    ```cmd
+   # Basic installation
    pip install -r requirements.txt
+   
+   # Or install with optional features (recommended)
+   pip install -e ".[charts,svg,dev]"
    ```
 6. Run the application:
    ```cmd
@@ -109,14 +115,14 @@ If Windows Defender is blocking the application:
 
 #### Issue: "Python is not recognized as an internal or external command"
 **Solution:**
-1. Reinstall Python with **"Add Python to PATH"** checked
+1. Reinstall Python 3.12+ with **"Add Python to PATH"** checked
 2. Or manually add Python to PATH:
    - Right-click **This PC** → **Properties**
    - Click **Advanced system settings**
    - Click **Environment Variables**
    - Under **System variables**, find and select **Path**, click **Edit**
-   - Click **New** and add: `C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python3XX\`
-   - Also add: `C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python3XX\Scripts\`
+   - Click **New** and add: `C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python312\`
+   - Also add: `C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python312\Scripts\`
 
 #### Issue: "Access is denied" when running application
 **Solutions:**
@@ -153,10 +159,17 @@ If Windows Defender is blocking the application:
    venv\Scripts\activate
    pip uninstall -r requirements.txt -y
    pip install -r requirements.txt
+   
+   # Or install with optional features
+   pip install -e ".[charts,svg,dev]"
    ```
 2. **Clear pip cache**:
    ```cmd
    pip cache purge
+   ```
+3. **PyQt6 specific issues**:
+   ```cmd
+   pip install --upgrade PyQt6 PyQt6-Qt6
    ```
 
 ### Performance Optimization
@@ -196,17 +209,28 @@ FileAnalyzer may request administrator rights for:
 
 1. **Check this guide** for common solutions
 2. **Run Windows Update** to ensure system compatibility
-3. **Update graphics and system drivers**
+3. **Update graphics and system drivers** (important for PyQt6)
 4. **Try running as Administrator**
-5. **Report issues** on [GitHub Issues](https://github.com/fileanalyzer/FileAnalyzer/issues)
+5. **Check test reports** in `documents/reports/` for known issues
+6. **Run diagnostic tests**:
+   ```cmd
+   # Test PyQt6 installation
+   python -c "import PyQt6.QtWidgets; print('PyQt6 OK')"
+   
+   # Test optional dependencies
+   python -c "import matplotlib; print('Matplotlib OK')"
+   python -c "import numpy; print('Numpy OK')"
+   ```
 
 ### System Information for Bug Reports
 
 If reporting issues, include:
 - **Windows version**: Run `winver` in Command Prompt
-- **Python version**: Run `python --version`
+- **Python version**: Run `python --version` (should be 3.12+)
+- **PyQt6 version**: Run `python -c "import PyQt6.QtCore; print(PyQt6.QtCore.PYQT_VERSION_STR)"`
 - **Error messages**: Copy exact error text
 - **System specs**: RAM, storage type (HDD/SSD)
+- **Test results**: Check `documents/reports/` for test failures
 
 ## 🚀 Advanced Usage
 
@@ -221,6 +245,12 @@ python -m src.main --directory "C:\Users\Username\Documents"
 
 # Run in debug mode
 python -m src.main --debug
+
+# Run tests (if dev dependencies installed)
+pytest tests/ --tb=short
+
+# Run visual regression tests
+pytest tests/visual/ -m visual
 ```
 
 ### Custom Configuration
@@ -235,6 +265,12 @@ max_concurrent_workers=4
 theme=dark
 auto_save_results=true
 confirm_deletions=true
+enable_visual_regression_tests=false
+
+[Development]
+run_tests_on_startup=false
+generate_test_reports=true
+enable_coverage_reporting=false
 ```
 
 ---

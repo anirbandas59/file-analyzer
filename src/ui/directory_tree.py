@@ -42,16 +42,16 @@ class DirectoryTreeView(QTreeView):
         # Use provided root path or default to home directory
         if root_path is None:
             root_path = str(Path.home())
-        
+
         # Validate the root path
         if not os.path.exists(root_path) or not os.path.isdir(root_path):
             root_path = str(Path.home())  # Fallback to home if invalid
-        
+
         # Clear existing tree
         self.model.clear()
         self.model.setHorizontalHeaderLabels(["Directories"])
         self.path_dict.clear()
-        
+
         root_item = QStandardItem(os.path.basename(root_path) or root_path)
         root_item.setData(root_path, Qt.ItemDataRole.UserRole)
         self.model.appendRow(root_item)
@@ -66,16 +66,16 @@ class DirectoryTreeView(QTreeView):
     def set_root_directory(self, root_path):
         """
         Set a new root directory for the tree view.
-        
+
         Args:
             root_path: Path to the new root directory
-            
+
         Returns:
             bool: True if successful, False if path is invalid
         """
         if not root_path or not os.path.exists(root_path) or not os.path.isdir(root_path):
             return False
-            
+
         try:
             # Check if we have read permissions
             os.listdir(root_path)
@@ -152,7 +152,7 @@ class DirectoryTreeView(QTreeView):
         # We only care about the first column
         index = next(idx for idx in indexes if idx.column() == 0)
         return self.path_dict.get(index)
-    
+
     def get_root_path(self):
         """Returns the current root directory path"""
         if self.model.rowCount() > 0:

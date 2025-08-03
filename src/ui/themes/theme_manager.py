@@ -1,18 +1,31 @@
 #!/usr/bin/env python3
 # File: src/ui/themes/theme_manager.py
 
-from pathlib import Path
+"""
+Modern Theme Manager using Design System
+
+This module provides a comprehensive theme management system built on top of
+the design system for consistent and maintainable theming.
+"""
 
 from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtWidgets import QApplication
 
-from .styles import BorderRadius, DarkTheme, ModernTheme, Spacing, Typography
+from .chart_theming import chart_theme_manager
+from .icon_manager import icon_manager
+
+# Import new design system components
+from .theme_provider import theme_provider
 
 
 class ThemeManager(QObject):
     """
     Central theme manager for the File Analyzer application.
-    Handles theme switching, stylesheet management, and theme-related utilities.
+
+    This manager integrates with the new design system to provide:
+    - Consistent theme switching
+    - Chart theming integration
+    - Icon management
+    - Backward compatibility with existing code
     """
 
     # Signal emitted when theme changes
@@ -20,8 +33,15 @@ class ThemeManager(QObject):
 
     def __init__(self):
         super().__init__()
-        self.current_theme = "light"
-        self.themes_dir = Path(__file__).parent
+        self._setup_connections()
+
+    def _setup_connections(self):
+        """Setup connections between different theme components"""
+        # Forward theme changes from the theme provider
+        theme_provider.theme_changed.connect(self.theme_changed.emit)
+
+        # Auto-configure charts when theme changes
+        theme_provider.theme_changed.connect(self._on_theme_changed)
 
     def apply_theme(self, theme_name="light"):
         """
@@ -30,17 +50,9 @@ class ThemeManager(QObject):
         Args:
             theme_name: Name of the theme to apply ("light" or "dark")
         """
-        app = QApplication.instance()
-        if not app:
-            return
-
-        # Load the appropriate stylesheet
-        stylesheet = self.get_stylesheet(theme_name)
-        app.setStyleSheet(stylesheet)
-
-        # Update current theme
-        self.current_theme = theme_name
-        self.theme_changed.emit(theme_name)
+        # Use the new theme provider
+        theme_provider.set_theme(theme_name)
+        theme_provider.apply_theme_to_app()
 
     def get_stylesheet(self, theme_name="light"):
         """
@@ -52,654 +64,82 @@ class ThemeManager(QObject):
         Returns:
             Complete CSS stylesheet as string
         """
-        if theme_name == "dark":
-            return self._get_dark_stylesheet()
-        else:
-            return self._get_light_stylesheet()
-
-    def _get_light_stylesheet(self):
-        """Generate the light theme stylesheet."""
-        return f"""
-        /* Main Application Window */
-        QMainWindow {{
-            background-color: {ModernTheme.BACKGROUND.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            font-family: {Typography.MAIN_FONT};
-            font-size: {Typography.FONT_MD};
-        }}
-
-        /* Panels and Containers */
-        QWidget {{
-            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-        }}
-
-        QFrame {{
-            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
-            border-radius: {BorderRadius.MD};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        /* Splitter */
-        QSplitter::handle {{
-            background-color: {ModernTheme.MEDIUM_GRAY.name()};
-            width: 2px;
-            height: 2px;
-        }}
-
-        QSplitter::handle:hover {{
-            background-color: {ModernTheme.PRIMARY.name()};
-        }}
-
-        /* Buttons */
-        QPushButton {{
-            background-color: {ModernTheme.PRIMARY.name()};
-            color: {ModernTheme.WHITE.name()};
-            border: none;
-            border-radius: {BorderRadius.SM};
-            padding: {Spacing.SM}px {Spacing.MD}px;
-            font-weight: {Typography.WEIGHT_MEDIUM};
-            font-size: {Typography.FONT_MD};
-            min-height: 20px;
-        }}
-
-        QPushButton:hover {{
-            background-color: {ModernTheme.PRIMARY_DARK.name()};
-        }}
-
-        QPushButton:pressed {{
-            background-color: {ModernTheme.PRIMARY_DARK.name()};
-            padding-top: {Spacing.SM + 1}px;
-        }}
-
-        QPushButton:disabled {{
-            background-color: {ModernTheme.MEDIUM_GRAY.name()};
-            color: {ModernTheme.DARK_GRAY.name()};
-        }}
-
-        /* Labels */
-        QLabel {{
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            background-color: transparent;
-            border: none;
-        }}
-
-        /* Title Cards and Headers */
-        QLabel[class=\"title\"] {{
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            font-weight: {Typography.WEIGHT_BOLD};
-            background-color: transparent;
-        }}
-
-        QLabel[class=\"subtitle\"] {{
-            color: {ModernTheme.DARK_GRAY.name()};
-            background-color: transparent;
-        }}
-
-        /* Main Title */
-        QLabel#main_title {{
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            background-color: transparent;
-        }}
-
-        /* Card Widget Containers */
-        CardWidget {{
-            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            border-radius: 8px;
-        }}
-
-        TitleCard {{
-            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            border-radius: 8px;
-        }}
-
-        /* Separator Lines */
-        QFrame#separator {{
-            background-color: {ModernTheme.MEDIUM_GRAY.name()};
-            border: none;
-            max-height: 1px;
-        }}
-
-        /* Input Fields */
-        QLineEdit {{
-            background-color: {ModernTheme.WHITE.name()};
-            border: 1px solid {ModernTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-            padding: {Spacing.SM}px {Spacing.MD}px;
-            font-size: {Typography.FONT_MD};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        QLineEdit:focus {{
-            border: 2px solid {ModernTheme.PRIMARY.name()};
-            padding: {Spacing.SM - 1}px {Spacing.MD - 1}px;
-        }}
-
-        QLineEdit::placeholder {{
-            color: {ModernTheme.DARK_GRAY.name()};
-        }}
-
-        /* Tree View */
-        QTreeView {{
-            background-color: {ModernTheme.WHITE.name()};
-            border: 1px solid {ModernTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.MD};
-            selection-background-color: {ModernTheme.PRIMARY.name()};
-            outline: none;
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        QTreeView::item {{
-            padding: {Spacing.XS}px {Spacing.SM}px;
-            border: none;
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            background-color: {ModernTheme.WHITE.name()};
-        }}
-
-        QTreeView::item:hover {{
-            background-color: {ModernTheme.PRIMARY_LIGHT.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        QTreeView::item:selected {{
-            background-color: {ModernTheme.PRIMARY.name()};
-            color: {ModernTheme.WHITE.name()};
-        }}
-
-        QTreeView::branch:has-children:!has-siblings:closed,
-        QTreeView::branch:closed:has-children:has-siblings {{
-            border-image: none;
-            image: none;
-        }}
-
-        QTreeView::branch:open:has-children:!has-siblings,
-        QTreeView::branch:open:has-children:has-siblings {{
-            border-image: none;
-            image: none;
-        }}
-
-        /* Table View */
-        QTableView {{
-            background-color: {ModernTheme.WHITE.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
-            border-radius: {BorderRadius.MD};
-            gridline-color: {ModernTheme.MEDIUM_GRAY.name()};
-            selection-background-color: {ModernTheme.FILE_ROW_SELECTED.name()};
-            outline: none;
-            alternate-background-color: {ModernTheme.FILE_ROW_BACKGROUND.name()};
-        }}
-
-        QTableView::item {{
-            padding: {Spacing.SM}px;
-            border: none;
-            background-color: {ModernTheme.FILE_ROW_BACKGROUND.name()};
-            color: {ModernTheme.FILE_ROW_TEXT.name()};
-            min-height: 24px;
-        }}
-
-        QTableView::item:hover {{
-            background-color: {ModernTheme.FILE_ROW_HOVER.name()};
-            color: {ModernTheme.FILE_ROW_TEXT.name()};
-        }}
-
-        QTableView::item:selected {{
-            background-color: {ModernTheme.FILE_ROW_SELECTED.name()};
-            color: {ModernTheme.WHITE.name()};
-        }}
-
-        QTableView::item:alternate {{
-            background-color: {ModernTheme.FILE_ROW_BACKGROUND.name()};
-        }}
-
-        /* Header Views */
-        QHeaderView::section {{
-            background-color: {ModernTheme.LIGHT_GRAY.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            padding: {Spacing.MD}px {Spacing.SM}px;
-            font-weight: {Typography.WEIGHT_BOLD};
-            font-size: {Typography.FONT_MD};
-            border: none;
-            border-bottom: 1px solid {ModernTheme.MEDIUM_GRAY.name()};
-        }}
-
-        QHeaderView::section:hover {{
-            background-color: {ModernTheme.MEDIUM_GRAY.name()};
-        }}
-
-        /* Tab Widget */
-        QTabWidget::pane {{
-            background-color: {ModernTheme.WHITE.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
-            border-radius: {BorderRadius.MD};
-            top: -1px;
-        }}
-
-        QTabBar::tab {{
-            background-color: {ModernTheme.LIGHT_GRAY.name()};
-            color: {ModernTheme.DARK_GRAY.name()};
-            padding: {Spacing.SM}px {Spacing.MD}px;
-            margin-right: 2px;
-            border-top-left-radius: {BorderRadius.SM};
-            border-top-right-radius: {BorderRadius.SM};
-        }}
-
-        QTabBar::tab:selected {{
-            background-color: {ModernTheme.WHITE.name()};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            font-weight: {Typography.WEIGHT_MEDIUM};
-        }}
-
-        QTabBar::tab:hover:!selected {{
-            background-color: {ModernTheme.HOVER.name()};
-        }}
-
-        /* Status Bar */
-        QStatusBar {{
-            background-color: {ModernTheme.LIGHT_GRAY.name()};
-            border-top: 1px solid {ModernTheme.BORDER.name()};
-            color: {ModernTheme.DARK_GRAY.name()};
-            font-size: {Typography.FONT_SM};
-        }}
-
-        /* Scroll Bars */
-        QScrollBar:vertical {{
-            background: {ModernTheme.LIGHT_GRAY.name()};
-            width: 12px;
-            border-radius: {BorderRadius.SM};
-        }}
-
-        QScrollBar::handle:vertical {{
-            background: {ModernTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-            min-height: 20px;
-        }}
-
-        QScrollBar::handle:vertical:hover {{
-            background: {ModernTheme.PRIMARY.name()};
-        }}
-
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-            border: none;
-            background: none;
-        }}
-
-        QScrollBar:horizontal {{
-            background: {ModernTheme.LIGHT_GRAY.name()};
-            height: 12px;
-            border-radius: {BorderRadius.SM};
-        }}
-
-        QScrollBar::handle:horizontal {{
-            background: {ModernTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-            min-width: 20px;
-        }}
-
-        QScrollBar::handle:horizontal:hover {{
-            background: {ModernTheme.PRIMARY.name()};
-        }}
-
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            border: none;
-            background: none;
-        }}
-        """
-
-    def _get_dark_stylesheet(self):
-        """Generate the dark theme stylesheet."""
-        return f"""
-        /* Main Application Window */
-        QMainWindow {{
-            background-color: {DarkTheme.BACKGROUND.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            font-family: {Typography.MAIN_FONT};
-            font-size: {Typography.FONT_MD};
-        }}
-
-        /* Panels and Containers */
-        QWidget {{
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            border: none;
-        }}
-
-        QFrame {{
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {DarkTheme.BORDER.name()};
-            border-radius: {BorderRadius.MD};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        /* Card Widget Containers for better contrast */
-        CardWidget {{
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {DarkTheme.BORDER.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            border-radius: 8px;
-        }}
-
-        TitleCard {{
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {DarkTheme.BORDER.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            border-radius: 8px;
-        }}
-
-        /* Separator Lines */
-        QFrame#separator {{
-            background-color: {DarkTheme.MEDIUM_GRAY.name()};
-            border: none;
-            max-height: 1px;
-        }}
-
-        /* Tab Widget */
-        QTabWidget::pane {{
-            border: 1px solid {DarkTheme.BORDER.name()};
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            border-radius: {BorderRadius.MD};
-        }}
-
-        QTabBar::tab {{
-            background-color: {DarkTheme.LIGHT_GRAY.name()};
-            color: {DarkTheme.DARK_GRAY.name()};
-            padding: {Spacing.SM}px {Spacing.LG}px;
-            margin-right: 2px;
-            border-top-left-radius: {BorderRadius.MD};
-            border-top-right-radius: {BorderRadius.MD};
-            font-size: {Typography.FONT_MD};
-            font-weight: {Typography.WEIGHT_MEDIUM};
-        }}
-
-        QTabBar::tab:selected {{
-            background-color: {DarkTheme.PRIMARY.name()};
-            color: {DarkTheme.WHITE.name()};
-            font-weight: {Typography.WEIGHT_BOLD};
-        }}
-
-        QTabBar::tab:hover {{
-            background-color: {DarkTheme.PRIMARY_LIGHT.name()};
-            color: {DarkTheme.WHITE.name()};
-        }}
-
-        /* Buttons */
-        QPushButton {{
-            background-color: {DarkTheme.PRIMARY.name()};
-            color: {DarkTheme.WHITE.name()};
-            border: none;
-            border-radius: {BorderRadius.SM};
-            padding: {Spacing.SM}px {Spacing.MD}px;
-            font-weight: {Typography.WEIGHT_MEDIUM};
-            font-size: {Typography.FONT_MD};
-            min-height: 20px;
-        }}
-
-        QPushButton:hover {{
-            background-color: {DarkTheme.PRIMARY_DARK.name()};
-        }}
-
-        QPushButton:pressed {{
-            background-color: {DarkTheme.PRIMARY_DARK.name()};
-            padding-top: {Spacing.SM + 1}px;
-        }}
-
-        QPushButton:disabled {{
-            background-color: {DarkTheme.MEDIUM_GRAY.name()};
-            color: {DarkTheme.DARK_GRAY.name()};
-        }}
-
-        /* Labels */
-        QLabel {{
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            background-color: transparent;
-            border: none;
-        }}
-
-        /* Title Cards and Headers */
-        QLabel[class=\"title\"] {{
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            font-weight: {Typography.WEIGHT_BOLD};
-            background-color: transparent;
-        }}
-
-        QLabel[class=\"subtitle\"] {{
-            color: {DarkTheme.DARK_GRAY.name()};
-            background-color: transparent;
-        }}
-
-        /* Directories and File Distribution Labels */
-        CardWidget QLabel {{
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            background-color: transparent;
-        }}
-
-        TitleCard QLabel {{
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            background-color: transparent;
-        }}
-
-        /* Main Title */
-        QLabel#main_title {{
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            background-color: transparent;
-        }}
-
-        /* Input Fields */
-        QLineEdit {{
-            background-color: {DarkTheme.LIGHT_GRAY.name()};
-            border: 1px solid {DarkTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-            padding: {Spacing.SM}px {Spacing.MD}px;
-            font-size: {Typography.FONT_MD};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        QLineEdit:focus {{
-            border: 2px solid {DarkTheme.PRIMARY.name()};
-            padding: {Spacing.SM - 1}px {Spacing.MD - 1}px;
-        }}
-
-        QLineEdit::placeholder {{
-            color: {DarkTheme.DARK_GRAY.name()};
-        }}
-
-        /* Tree View */
-        QTreeView {{
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {DarkTheme.BORDER.name()};
-            border-radius: {BorderRadius.MD};
-            selection-background-color: {DarkTheme.PRIMARY.name()};
-            outline: none;
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        QTreeView::item {{
-            padding: {Spacing.SM}px;
-            border: none;
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-        }}
-
-        QTreeView::item:hover {{
-            background-color: {DarkTheme.HOVER.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-        }}
-
-        QTreeView::item:selected {{
-            background-color: {DarkTheme.PRIMARY.name()};
-            color: {DarkTheme.WHITE.name()};
-        }}
-
-        QTreeView::branch:has-siblings:!adjoins-item {{
-            border-image: none;
-            image: none;
-        }}
-
-        QTreeView::branch:has-siblings:adjoins-item {{
-            border-image: none;
-            image: none;
-        }}
-
-        QTreeView::branch:!has-children:!has-siblings:adjoins-item {{
-            border-image: none;
-            image: none;
-        }}
-
-        /* Table View */
-        QTableView {{
-            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {DarkTheme.BORDER.name()};
-            border-radius: {BorderRadius.MD};
-            gridline-color: {DarkTheme.MEDIUM_GRAY.name()};
-            selection-background-color: {DarkTheme.FILE_ROW_SELECTED.name()};
-            outline: none;
-            alternate-background-color: {DarkTheme.FILE_ROW_BACKGROUND.name()};
-        }}
-
-        QTableView::item {{
-            padding: {Spacing.SM}px;
-            border: none;
-            background-color: {DarkTheme.FILE_ROW_BACKGROUND.name()};
-            color: {DarkTheme.FILE_ROW_TEXT.name()};
-            min-height: 24px;
-        }}
-
-        QTableView::item:hover {{
-            background-color: {DarkTheme.FILE_ROW_HOVER.name()};
-            color: {DarkTheme.FILE_ROW_TEXT.name()};
-        }}
-
-        QTableView::item:selected {{
-            background-color: {DarkTheme.FILE_ROW_SELECTED.name()};
-            color: {DarkTheme.WHITE.name()};
-        }}
-
-        QTableView::item:alternate {{
-            background-color: {DarkTheme.FILE_ROW_BACKGROUND.name()};
-        }}
-
-        /* Header Views */
-        QHeaderView::section {{
-            background-color: {DarkTheme.LIGHT_GRAY.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            padding: {Spacing.MD}px {Spacing.SM}px;
-            font-weight: {Typography.WEIGHT_BOLD};
-            font-size: {Typography.FONT_MD};
-            border: none;
-            border-bottom: 1px solid {DarkTheme.MEDIUM_GRAY.name()};
-        }}
-
-        QHeaderView::section:hover {{
-            background-color: {DarkTheme.MEDIUM_GRAY.name()};
-        }}
-
-        /* Splitter */
-        QSplitter::handle {{
-            background-color: {DarkTheme.MEDIUM_GRAY.name()};
-        }}
-
-        QSplitter::handle:horizontal {{
-            width: 2px;
-        }}
-
-        QSplitter::handle:vertical {{
-            height: 2px;
-        }}
-
-        /* Progress Bar */
-        QProgressBar {{
-            background-color: {DarkTheme.LIGHT_GRAY.name()};
-            border: 1px solid {DarkTheme.BORDER.name()};
-            border-radius: {BorderRadius.SM};
-            text-align: center;
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            font-size: {Typography.FONT_SM};
-        }}
-
-        QProgressBar::chunk {{
-            background-color: {DarkTheme.PRIMARY.name()};
-            border-radius: {BorderRadius.SM};
-        }}
-
-        /* Status Bar */
-        QStatusBar {{
-            background-color: {DarkTheme.LIGHT_GRAY.name()};
-            color: {DarkTheme.VERY_DARK_GRAY.name()};
-            border-top: 1px solid {DarkTheme.BORDER.name()};
-            font-size: {Typography.FONT_SM};
-        }}
-
-        /* Scroll Bars */
-        QScrollBar:vertical {{
-            background: {DarkTheme.LIGHT_GRAY.name()};
-            width: 15px;
-            border-radius: {BorderRadius.SM};
-        }}
-
-        QScrollBar::handle:vertical {{
-            background: {DarkTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-            min-height: 20px;
-        }}
-
-        QScrollBar::handle:vertical:hover {{
-            background: {DarkTheme.PRIMARY.name()};
-        }}
-
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-            border: none;
-            background: none;
-        }}
-
-        QScrollBar:horizontal {{
-            background: {DarkTheme.LIGHT_GRAY.name()};
-            height: 15px;
-            border-radius: {BorderRadius.SM};
-        }}
-
-        QScrollBar::handle:horizontal {{
-            background: {DarkTheme.MEDIUM_GRAY.name()};
-            border-radius: {BorderRadius.SM};
-            min-width: 20px;
-        }}
-
-        QScrollBar::handle:horizontal:hover {{
-            background: {DarkTheme.PRIMARY.name()};
-        }}
-
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            border: none;
-            background: none;
-        }}
-        """
+        # Temporarily set theme to get stylesheet
+        current_theme = theme_provider.current_theme
+        theme_provider.set_theme(theme_name)
+        stylesheet = theme_provider.generate_global_stylesheet()
+
+        # Restore original theme if it was different
+        if current_theme != theme_name:
+            theme_provider.set_theme(current_theme)
+
+        return stylesheet
 
     def get_color(self, color_name):
         """
         Get a color from the current theme.
 
         Args:
-            color_name: Name of the color (e.g., "PRIMARY", "BACKGROUND")
+            color_name: Name of the color role or attribute
 
         Returns:
             QColor object
         """
-        theme_class = DarkTheme if self.current_theme == "dark" else ModernTheme
-        return getattr(theme_class, color_name, theme_class.PRIMARY)
+        # Map old color names to new system
+        color_mapping = {
+            "PRIMARY": "primary",
+            "BACKGROUND": "background",
+            "PANEL_BACKGROUND": "surface",
+            "BORDER": "border",
+            "VERY_DARK_GRAY": "text_primary",
+            "DARK_GRAY": "text_secondary",
+            "MEDIUM_GRAY": "text_tertiary",
+            "WHITE": "text_inverse",
+        }
+
+        mapped_name = color_mapping.get(color_name, color_name.lower())
+
+        try:
+            return theme_provider.get_color(mapped_name)
+        except AttributeError:
+            # Fallback to primary color if attribute doesn't exist
+            return theme_provider.current_palette.primary
 
     def toggle_theme(self):
         """Toggle between light and dark themes."""
-        new_theme = "dark" if self.current_theme == "light" else "light"
+        new_theme = "dark" if theme_provider.current_theme == "light" else "light"
         self.apply_theme(new_theme)
 
     def get_current_theme(self):
         """Get the current theme name."""
-        return self.current_theme
+        return theme_provider.current_theme
+
+    @property
+    def current_theme(self):
+        """Current theme name for backward compatibility"""
+        return theme_provider.current_theme
+
+    def _on_theme_changed(self, theme_name: str):
+        """Handle theme changes"""
+        # Configure chart theming
+        chart_theme_manager.configure_matplotlib()
+
+        # Clear icon cache
+        icon_manager.clear_cache()
+
+    # Convenience methods for accessing design system components
+    def get_chart_colors(self):
+        """Get chart colors for current theme"""
+        return chart_theme_manager.get_chart_style_config()['colors']
+
+    def get_icon(self, icon_name: str, size: int = 20):
+        """Get a themed icon"""
+        return icon_manager.get_icon(icon_name, size)
+
+    def apply_chart_theme(self):
+        """Apply theme to matplotlib charts"""
+        chart_theme_manager.configure_matplotlib()
 
 
-# Global theme manager instance
+# Global theme manager instance - maintains backward compatibility
 theme_manager = ThemeManager()

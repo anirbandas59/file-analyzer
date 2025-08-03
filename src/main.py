@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # File: src/main.py
 
-import sys
 import atexit
+import sys
 
 from PyQt6.QtWidgets import QApplication
 
@@ -21,10 +21,10 @@ def main():
         # Initialize logging and settings
         logger.log_startup("1.0.0")
         logger.info("Initializing File Analyzer application")
-        
+
         # Register shutdown handler
         atexit.register(shutdown_handler)
-        
+
         # Create Qt application
         app = QApplication(sys.argv)
         app.setApplicationName("File Analyzer")
@@ -38,17 +38,17 @@ def main():
 
         # Create and configure main window
         main_window = MainWindow()
-        
+
         # Restore window geometry from settings
         geometry = settings.get_window_geometry()
         main_window.resize(geometry["width"], geometry["height"])
         main_window.move(geometry["x"], geometry["y"])
-        
+
         if geometry["maximized"]:
             main_window.showMaximized()
         else:
             main_window.show()
-            
+
         logger.info(f"Main window created and shown: {geometry}")
 
         # Setup application exit handler
@@ -58,15 +58,15 @@ def main():
             if not main_window.isMaximized():
                 geo = main_window.geometry()
                 settings.set_window_geometry(
-                    geo.width(), geo.height(), 
-                    geo.x(), geo.y(), 
+                    geo.width(), geo.height(),
+                    geo.x(), geo.y(),
                     main_window.isMaximized()
                 )
             else:
                 settings.set("window.maximized", True)
-            
+
             logger.log_shutdown()
-        
+
         app.aboutToQuit.connect(on_app_exit)
 
         # Start the application event loop
@@ -74,7 +74,7 @@ def main():
         exit_code = app.exec()
         logger.info(f"Application exited with code: {exit_code}")
         sys.exit(exit_code)
-        
+
     except Exception as e:
         logger.critical("Fatal error during application startup", e)
         sys.exit(1)

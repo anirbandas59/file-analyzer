@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # File: src/ui/components/visualization/charts/bar_chart.py
 
-from typing import Any
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPainter, QPen, QColor
+from PyQt6.QtGui import QColor, QPainter, QPen
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from ....themes.styles import ModernTheme, Spacing, Typography
@@ -15,7 +13,7 @@ from .base_chart import BaseChart
 class BarWidget(QWidget):
     """Custom widget for drawing individual bars."""
 
-    def __init__(self, value: float, max_value: float, label: str, color: str = None):
+    def __init__(self, value: float, max_value: float, label: str, color: str | None = None):
         super().__init__()
         self.value = value
         self.max_value = max_value
@@ -72,7 +70,7 @@ class SizeDistributionChart(BaseChart):
     def refresh_chart(self):
         """Refresh the chart display."""
         from src.utils.logger import logger
-        
+
         # Clear existing bars
         for i in reversed(range(self.bars_layout.count())):
             child = self.bars_layout.itemAt(i).widget()
@@ -83,7 +81,7 @@ class SizeDistributionChart(BaseChart):
             logger.debug(f"Size distribution chart: No data to display - data exists: {bool(self.distribution_data)}, counts: {self.distribution_data.file_counts if self.distribution_data else 'None'}")
             self.show_no_data_message("No file size data available")
             return
-            
+
         logger.debug(f"Size distribution chart: Displaying {len(self.distribution_data.size_ranges)} size ranges")
 
         # Find max count for scaling
@@ -120,7 +118,7 @@ class SizeDistributionChart(BaseChart):
             """)
 
             # Bar with count info
-            bar_info_layout = QHBoxLayout()
+            QHBoxLayout()
 
             # Bar widget
             bar_widget = BarWidget(count, max_count, size_range, self._get_bar_color(i))
@@ -182,7 +180,7 @@ class FileAgeChart(BaseChart):
     def refresh_chart(self):
         """Refresh the chart display."""
         from src.utils.logger import logger
-        
+
         # Clear existing bars
         for i in reversed(range(self.bars_layout.count())):
             child = self.bars_layout.itemAt(i).widget()
@@ -193,7 +191,7 @@ class FileAgeChart(BaseChart):
             logger.debug(f"File age chart: No data to display - data exists: {bool(self.age_data)}, counts: {self.age_data.file_counts if self.age_data else 'None'}")
             self.show_no_data_message("No file age data available")
             return
-            
+
         logger.debug(f"File age chart: Displaying {len(self.age_data.age_ranges)} age ranges")
 
         # Find max count for scaling

@@ -13,10 +13,17 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ...themes.styles import ModernTheme, Spacing, Typography
-from ..card_widget import CardWidget, StatsCard, TitleCard
+from ...themes.chart_theming import chart_theme_manager
+from ...themes.design_system import Spacing
+from ...themes.theme_provider import theme_provider
+from ..card_widget import CardWidget, StatsCard
 from ..modern_button import ModernButton
-from .charts import DirectoryTreeChart, FileAgeChart, FileTypePieChart, SizeDistributionChart
+from .charts import (
+    DirectoryTreeChart,
+    FileAgeChart,
+    FileTypePieChart,
+    SizeDistributionChart,
+)
 from .services.data_service import VisualizationDataService
 
 
@@ -39,11 +46,17 @@ class VisualizationDashboard(QWidget):
         # Chart widgets
         self.charts = {}
 
+        # Initialize chart theming
+        chart_theme_manager.configure_matplotlib()
+
         # Setup UI
         self.setup_ui()
 
         # Connect signals
         self.setup_signals()
+
+        # Connect to theme changes
+        theme_provider.theme_changed.connect(self._on_theme_changed)
 
     def setup_ui(self):
         """Setup the dashboard UI."""
@@ -70,15 +83,7 @@ class VisualizationDashboard(QWidget):
 
         # Title
         title_label = QLabel("Visualization Dashboard")
-        title_label.setStyleSheet(f"""
-        QLabel {{
-            font-size: {Typography.FONT_XL};
-            font-weight: {Typography.WEIGHT_BOLD};
-            color: {ModernTheme.VERY_DARK_GRAY.name()};
-            border: none;
-            background: transparent;
-        }}
-        """)
+        title_label.setProperty("class", "title")
 
         # Export all button
         self.export_all_button = ModernButton("Export All", "secondary")
@@ -234,7 +239,7 @@ class VisualizationDashboard(QWidget):
     def update_charts(self):
         """Update all chart widgets with new data."""
         from src.utils.logger import logger
-        
+
         metadata = self.data_service.get_metadata()
         logger.debug(f"Dashboard update_charts: Processing {metadata.total_files} files")
 
@@ -246,19 +251,19 @@ class VisualizationDashboard(QWidget):
         # Update directory structure chart
         directory_hierarchy = self.data_service.get_directory_hierarchy()
         if directory_hierarchy:
-            logger.debug(f"Dashboard update_charts: Directory hierarchy available")
+            logger.debug("Dashboard update_charts: Directory hierarchy available")
             self.directory_chart.update_data(directory_hierarchy, metadata)
         else:
-            logger.debug(f"Dashboard update_charts: No directory hierarchy data")
+            logger.debug("Dashboard update_charts: No directory hierarchy data")
 
         # Update file size distribution chart
         size_distribution = self.data_service.get_file_size_distribution()
-        logger.debug(f"Dashboard update_charts: Size distribution updating")
+        logger.debug("Dashboard update_charts: Size distribution updating")
         self.size_chart.update_data(size_distribution, metadata)
 
         # Update file age analysis chart
         age_distribution = self.data_service.get_file_age_distribution()
-        logger.debug(f"Dashboard update_charts: Age distribution updating")
+        logger.debug("Dashboard update_charts: Age distribution updating")
         self.age_chart.update_data(age_distribution, metadata)
 
     def on_chart_item_clicked(self, item_id: str, data: dict[str, Any]):
@@ -296,30 +301,13 @@ class VisualizationDashboard(QWidget):
         no_data_layout = QVBoxLayout(no_data_widget)
 
         no_data_label = QLabel("No data to visualize")
-        no_data_label.setStyleSheet(f"""
-        QLabel {{
-            color: {ModernTheme.DARK_GRAY.name()};
-            font-size: {Typography.FONT_LG};
-            padding: {Spacing.XXL}px;
-            text-align: center;
-            background: transparent;
-            border: none;
-        }}
-        """)
+        no_data_label.setProperty("class", "heading")
         no_data_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         instruction_label = QLabel(
             "Select a directory and click 'Scan' to analyze files"
         )
-        instruction_label.setStyleSheet(f"""
-        QLabel {{
-            color: {ModernTheme.DARK_GRAY.name()};
-            font-size: {Typography.FONT_MD};
-            text-align: center;
-            background: transparent;
-            border: none;
-        }}
-        """)
+        instruction_label.setProperty("class", "caption")
         instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         no_data_layout.addWidget(no_data_label)
@@ -360,3 +348,16 @@ class VisualizationDashboard(QWidget):
             return chart_widget.export_as_image(file_path)
 
         return False
+
+    def _on_theme_changed(self, theme_name: str):
+        """Handle theme changes - refresh all charts with new styling"""
+        # Reconfigure matplotlib for the new theme
+        chart_theme_manager.configure_matplotlib()
+
+        # Refresh all charts to apply new theming
+        if hasattr(self, 'charts'):
+            for chart in self.charts.values():
+                if hasattr(chart, 'refresh'):
+                    chart.refresh()
+                elif hasattr(chart, 'update'):
+                    chart.update()
