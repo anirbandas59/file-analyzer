@@ -194,6 +194,7 @@ dev = [
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "pytest-mock" },
+    { name = "pytest-qt" },
     { name = "pytest-timeout" },
     { name = "pytest-xvfb" },
 ]
@@ -218,6 +219,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1.1.0" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
     { name = "pytest-mock", specifier = ">=3.14.1" },
+    { name = "pytest-qt", specifier = ">=4.5.0" },
     { name = "pytest-timeout", specifier = ">=2.4.0" },
     { name = "pytest-xvfb", specifier = ">=3.1.1" },
 ]

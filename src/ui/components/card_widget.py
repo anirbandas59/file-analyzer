@@ -32,16 +32,8 @@ class CardWidget(QFrame):
         # Set frame properties
         self.setFrameShape(QFrame.Shape.NoFrame)
 
-        # Apply card styling
-        stylesheet = f"""
-        CardWidget {{
-            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
-            border: 1px solid {ModernTheme.BORDER.name()};
-            border-radius: {BorderRadius.LG};
-            padding: {Spacing.MD}px;
-        }}
-        """
-        self.setStyleSheet(stylesheet)
+        # Set object name for CSS styling
+        self.setObjectName("CardWidget")
 
         # Add shadow effect based on elevation
         self.add_shadow_effect()
@@ -119,11 +111,11 @@ class TitleCard(CardWidget):
         # Title label
         if self.title_text:
             self.title_label = QLabel(self.title_text)
+            self.title_label.setProperty("class", "title")
             self.title_label.setStyleSheet(f"""
             QLabel {{
                 font-size: {Typography.FONT_LG};
                 font-weight: {Typography.WEIGHT_BOLD};
-                color: {ModernTheme.VERY_DARK_GRAY.name()};
                 background-color: transparent;
                 border: none;
             }}
@@ -133,10 +125,10 @@ class TitleCard(CardWidget):
         # Subtitle label
         if self.subtitle_text:
             self.subtitle_label = QLabel(self.subtitle_text)
+            self.subtitle_label.setProperty("class", "subtitle")
             self.subtitle_label.setStyleSheet(f"""
             QLabel {{
                 font-size: {Typography.FONT_SM};
-                color: {ModernTheme.DARK_GRAY.name()};
                 background-color: transparent;
                 border: none;
             }}
@@ -147,13 +139,7 @@ class TitleCard(CardWidget):
         if self.title_text or self.subtitle_text:
             separator = QFrame()
             separator.setFrameShape(QFrame.Shape.HLine)
-            separator.setStyleSheet(f"""
-            QFrame {{
-                background-color: {ModernTheme.MEDIUM_GRAY.name()};
-                border: none;
-                max-height: 1px;
-            }}
-            """)
+            separator.setObjectName("separator")
             self.header_layout.addWidget(separator)
 
         self.main_layout.addWidget(self.header_widget)

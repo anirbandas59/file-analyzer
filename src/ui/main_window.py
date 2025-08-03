@@ -162,18 +162,12 @@ class MainWindow(QMainWindow):
         
         # App title
         self.title_label = QLabel("File System Analyzer")
-        self.title_label.setStyleSheet("""
-            QLabel {
-                font-size: 18px;
-                font-weight: bold;
-                color: #2c3e50;
-                padding: 5px 0px;
-            }
-        """)
+        self.title_label.setObjectName("main_title")
+        self.update_title_style()
         
         # Theme toggle button
-        self.theme_toggle_btn = ModernButton("🌙", "secondary")
-        self.theme_toggle_btn.setMaximumWidth(40)
+        self.theme_toggle_btn = ModernButton("Dark", "secondary")
+        self.theme_toggle_btn.setMaximumWidth(60)
         self.theme_toggle_btn.setToolTip("Toggle Dark/Light Theme")
         self.theme_toggle_btn.clicked.connect(self.toggle_theme)
         
@@ -321,31 +315,33 @@ class MainWindow(QMainWindow):
         theme_manager.apply_theme(new_theme)
         settings.set_theme(new_theme)
 
-        # Update button icon and tooltip
+        # Update button text and tooltip
         if new_theme == "dark":
-            self.theme_toggle_btn.setText("☀️")
+            self.theme_toggle_btn.setText("Light")
             self.theme_toggle_btn.setToolTip("Switch to Light Theme")
-            # Update title color for dark theme
-            self.title_label.setStyleSheet("""
-                QLabel {
-                    font-size: 18px;
-                    font-weight: bold;
-                    color: #e8eaed;
-                    padding: 5px 0px;
-                }
-            """)
         else:
-            self.theme_toggle_btn.setText("🌙")
+            self.theme_toggle_btn.setText("Dark")
             self.theme_toggle_btn.setToolTip("Switch to Dark Theme")
-            # Update title color for light theme
-            self.title_label.setStyleSheet("""
-                QLabel {
-                    font-size: 18px;
-                    font-weight: bold;
-                    color: #2c3e50;
-                    padding: 5px 0px;
-                }
-            """)
+        
+        # Update title styling
+        self.update_title_style()
+    
+    def update_title_style(self):
+        """Update the title label styling based on current theme."""
+        current_theme = theme_manager.get_current_theme()
+        if current_theme == "dark":
+            title_color = "#e8eaed"
+        else:
+            title_color = "#2c3e50"
+        
+        self.title_label.setStyleSheet(f"""
+            QLabel {{
+                font-size: 18px;
+                font-weight: bold;
+                color: {title_color};
+                padding: 5px 0px;
+            }}
+        """)
     
     def setup_recent_directories(self):
         """Setup the recent directories dropdown."""

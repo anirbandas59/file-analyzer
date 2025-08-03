@@ -138,6 +138,34 @@ class ThemeManager(QObject):
             background-color: transparent;
         }}
 
+        /* Main Title */
+        QLabel#main_title {{
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
+            background-color: transparent;
+        }}
+
+        /* Card Widget Containers */
+        CardWidget {{
+            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
+            border: 1px solid {ModernTheme.BORDER.name()};
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
+            border-radius: 8px;
+        }}
+
+        TitleCard {{
+            background-color: {ModernTheme.PANEL_BACKGROUND.name()};
+            border: 1px solid {ModernTheme.BORDER.name()};
+            color: {ModernTheme.VERY_DARK_GRAY.name()};
+            border-radius: 8px;
+        }}
+
+        /* Separator Lines */
+        QFrame#separator {{
+            background-color: {ModernTheme.MEDIUM_GRAY.name()};
+            border: none;
+            max-height: 1px;
+        }}
+
         /* Input Fields */
         QLineEdit {{
             background-color: {ModernTheme.WHITE.name()};
@@ -348,6 +376,28 @@ class ThemeManager(QObject):
             color: {DarkTheme.VERY_DARK_GRAY.name()};
         }}
 
+        /* Card Widget Containers for better contrast */
+        CardWidget {{
+            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
+            border: 1px solid {DarkTheme.BORDER.name()};
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
+            border-radius: 8px;
+        }}
+
+        TitleCard {{
+            background-color: {DarkTheme.PANEL_BACKGROUND.name()};
+            border: 1px solid {DarkTheme.BORDER.name()};
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
+            border-radius: 8px;
+        }}
+
+        /* Separator Lines */
+        QFrame#separator {{
+            background-color: {DarkTheme.MEDIUM_GRAY.name()};
+            border: none;
+            max-height: 1px;
+        }}
+
         /* Tab Widget */
         QTabWidget::pane {{
             border: 1px solid {DarkTheme.BORDER.name()};
@@ -419,6 +469,23 @@ class ThemeManager(QObject):
 
         QLabel[class=\"subtitle\"] {{
             color: {DarkTheme.DARK_GRAY.name()};
+            background-color: transparent;
+        }}
+
+        /* Directories and File Distribution Labels */
+        CardWidget QLabel {{
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
+            background-color: transparent;
+        }}
+
+        TitleCard QLabel {{
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
+            background-color: transparent;
+        }}
+
+        /* Main Title */
+        QLabel#main_title {{
+            color: {DarkTheme.VERY_DARK_GRAY.name()};
             background-color: transparent;
         }}
 
