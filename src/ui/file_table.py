@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import QAbstractItemView, QHeaderView, QTableView
 
 from src.models.file_system_model import FileSystemTableModel
 from src.utils.file_utils import format_size, scan_directory
+from src.utils.logger import logger
 
 
 class FileTableView(QTableView):
@@ -53,10 +54,14 @@ class FileTableView(QTableView):
     def update_files(self, path, full_scan=False):
         """Update the file list for the given directory path."""
         if not path or not os.path.isdir(path):
+            logger.warning(f"Invalid path for file scanning: {path}")
             return
+
+        logger.info(f"Starting file scan: {path} (full_scan={full_scan})")
 
         # If a scan is already running, stop it
         if self.scanner_thread and self.scanner_thread.isRunning():
+            logger.debug("Terminating existing scanner thread")
             self.scanner_thread.terminate()
             self.scanner_thread.wait()
 
@@ -100,9 +105,19 @@ class ScannerThread(QThread):
 
     def run(self):
         """Thread execution method."""
-        start_time = time.time()
-        file_list, total_size = scan_directory(self.path, self.full_scan)
-        scan_time = time.time() - start_time
+        try:
+            logger.debug(f"Scanner thread started for: {self.path}")
+            start_time = time.time()
+            
+            file_list, total_size = scan_directory(self.path, self.full_scan)
+            scan_time = time.time() - start_time
+            
+            logger.debug(f"Scan completed: {len(file_list)} files, {scan_time:.3f}s")
 
-        # Emit the signal with results
-        self.files_ready.emit(file_list, total_size, scan_time)
+            # Emit the signal with results
+            self.files_ready.emit(file_list, total_size, scan_time)
+            
+        except Exception as e:
+            logger.error(f"Error during directory scan: {self.path}", e)
+            # Emit empty results on error
+            self.files_ready.emit([], 0, 0.0)

@@ -5,7 +5,7 @@ import math
 from collections import defaultdict
 
 from PyQt6.QtCore import QRect, Qt, pyqtSignal
-from PyQt6.QtGui import QPainter
+from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
 from .themes.styles import FILE_COLORS, ModernTheme
@@ -87,8 +87,8 @@ class FileTypeBar(QWidget):
 
         # If no data, just draw a placeholder
         if not self.data and not self.test_data:
-            painter.fillRect(self.rect(), ModernTheme.LIGHT_GRAY)
-            painter.setPen(ModernTheme.DARK_GRAY)
+            painter.fillRect(self.rect(), QColor(ModernTheme.LIGHT_GRAY.name()))
+            painter.setPen(QColor(ModernTheme.DARK_GRAY.name()))
             painter.drawText(
                 self.rect(), Qt.AlignmentFlag.AlignCenter, "No data available"
             )

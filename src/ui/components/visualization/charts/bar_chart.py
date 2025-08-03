@@ -4,7 +4,7 @@
 from typing import Any
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPainter, QPen
+from PyQt6.QtGui import QPainter, QPen, QColor
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from ....themes.styles import ModernTheme, Spacing, Typography
@@ -35,14 +35,14 @@ class BarWidget(QWidget):
             bar_width = 0
 
         # Draw background
-        painter.fillRect(0, 0, self.width() - 100, self.height(), ModernTheme.LIGHT_GRAY)
+        painter.fillRect(0, 0, self.width() - 100, self.height(), QColor(ModernTheme.LIGHT_GRAY.name()))
 
         # Draw bar
         if bar_width > 0:
-            painter.fillRect(0, 0, bar_width, self.height(), self.color)
+            painter.fillRect(0, 0, bar_width, self.height(), QColor(self.color))
 
         # Draw value text
-        painter.setPen(QPen(ModernTheme.VERY_DARK_GRAY, 1))
+        painter.setPen(QPen(QColor(ModernTheme.VERY_DARK_GRAY.name()), 1))
         text_rect = painter.fontMetrics().boundingRect(f"{int(self.value)}")
         text_x = self.width() - 90
         text_y = self.height() // 2 + text_rect.height() // 2

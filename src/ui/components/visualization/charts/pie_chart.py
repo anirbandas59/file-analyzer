@@ -91,7 +91,7 @@ class PieChartWidget(QWidget):
 
             # Draw the segment
             painter.setBrush(QBrush(color))
-            painter.setPen(QPen(ModernTheme.WHITE, 2))
+            painter.setPen(QPen(QColor(ModernTheme.WHITE.name()), 2))
             painter.drawPie(chart_rect, start_angle, span_angle)
 
             # Store segment info for mouse events
@@ -137,7 +137,7 @@ class PieChartWidget(QWidget):
         )  # Negative because Y is inverted
 
         # Setup text drawing
-        painter.setPen(QPen(ModernTheme.WHITE))
+        painter.setPen(QPen(QColor(ModernTheme.WHITE.name())))
         font = QFont(Typography.MAIN_FONT.split(",")[0], 10)
         font.setBold(True)
         painter.setFont(font)
@@ -168,7 +168,7 @@ class PieChartWidget(QWidget):
             legend_y = chart_rect.bottom() + 20
 
         # Setup text drawing
-        painter.setPen(QPen(ModernTheme.VERY_DARK_GRAY))
+        painter.setPen(QPen(QColor(ModernTheme.VERY_DARK_GRAY.name())))
         font = QFont(Typography.MAIN_FONT.split(",")[0], 9)
         painter.setFont(font)
 
@@ -179,11 +179,11 @@ class PieChartWidget(QWidget):
             # Draw color box
             color_rect = QRect(legend_x, current_y, 12, 12)
             painter.fillRect(color_rect, QColor(item.color))
-            painter.setPen(QPen(ModernTheme.BORDER))
+            painter.setPen(QPen(QColor(ModernTheme.BORDER.name())))
             painter.drawRect(color_rect)
 
             # Draw text
-            painter.setPen(QPen(ModernTheme.VERY_DARK_GRAY))
+            painter.setPen(QPen(QColor(ModernTheme.VERY_DARK_GRAY.name())))
             text = f"{item.type} ({item.percentage:.1f}%)"
             painter.drawText(legend_x + 18, current_y + 10, text)
 
@@ -191,7 +191,7 @@ class PieChartWidget(QWidget):
 
     def draw_no_data_message(self, painter: QPainter):
         """Draw a message when there's no data."""
-        painter.setPen(QPen(ModernTheme.DARK_GRAY))
+        painter.setPen(QPen(QColor(ModernTheme.DARK_GRAY.name())))
         font = QFont(Typography.MAIN_FONT.split(",")[0], 14)
         painter.setFont(font)
 

@@ -3,6 +3,7 @@
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
+    QComboBox,
     QFileDialog,
     QHBoxLayout,
     QLabel,
@@ -24,6 +25,8 @@ from .directory_tree import DirectoryTreeView
 from .file_table import FileTableView
 from .themes.theme_manager import theme_manager
 from .visualization import FileTypeBar
+from ..utils.logger import logger
+from ..utils.settings import settings
 
 
 class MainWindow(QMainWindow):
@@ -33,15 +36,20 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        
+        logger.info("Initializing MainWindow")
 
         # Set window properties
         self.setWindowTitle("File System Analyzer")
 
-        # Apply modern theme
-        theme_manager.apply_theme("light")
+        # Load theme from settings (main.py will override this)
+        saved_theme = settings.get_theme()
+        theme_manager.apply_theme(saved_theme)
 
         # Initialize state
-        self.current_scan_path = ""
+        self.current_scan_path = settings.get_last_directory()
+        
+        logger.debug(f"Initial scan path: {self.current_scan_path}")
 
         # Create the central widget and main layout
         self.central_widget = QWidget()
@@ -53,6 +61,12 @@ class MainWindow(QMainWindow):
         # Create and setup the left panel (directory tree)
         self.left_panel = TitleCard("Directories", "Navigate and select folders")
         self.directory_tree = DirectoryTreeView()
+        
+        # Add recent directories dropdown
+        self.recent_dirs_combo = QComboBox()
+        self.recent_dirs_combo.setToolTip("Select from recently accessed directories")
+        self.recent_dirs_combo.currentTextChanged.connect(self.on_recent_directory_selected)
+        self.setup_recent_directories()
         
         # Add button layout for directory controls
         self.dir_button_layout = QHBoxLayout()
@@ -68,6 +82,7 @@ class MainWindow(QMainWindow):
         self.dir_button_layout.addWidget(self.scan_button)
 
         self.left_panel.add_content_widget(self.directory_tree)
+        self.left_panel.add_content_widget(self.recent_dirs_combo)
         
         # Create a widget to hold the button layout
         self.button_widget = QWidget()
@@ -191,12 +206,20 @@ class MainWindow(QMainWindow):
 
     def on_directory_selected(self, path):
         """Handler for when a directory is selected in the tree view."""
+        logger.log_ui_action("directory_selected", "directory_tree", {"path": path})
+        
         self.current_scan_path = path
+        settings.set_last_directory(path)
+        settings.add_recent_directory(path)
+        self.update_recent_directories()
+        
         self.update_status(f"Selected directory: {path}")
         self.file_table.update_files(path)
 
     def on_browse_clicked(self):
         """Handler for browse button click - opens directory selection dialog."""
+        logger.log_ui_action("browse_clicked", "browse_button")
+        
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.FileMode.Directory)
         dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
@@ -212,13 +235,19 @@ class MainWindow(QMainWindow):
             selected_dirs = dialog.selectedFiles()
             if selected_dirs:
                 selected_path = selected_dirs[0]
+                logger.info(f"User selected directory: {selected_path}")
                 
                 # Set the new root directory in the tree
                 if self.directory_tree.set_root_directory(selected_path):
                     self.current_scan_path = selected_path
+                    settings.set_last_directory(selected_path)
+                    settings.add_recent_directory(selected_path)
+                    self.update_recent_directories()
+                    
                     self.update_status(f"Selected directory: {selected_path}")
                     
                     # Auto-scan the new directory
+                    logger.info(f"Starting auto-scan of selected directory")
                     self.file_table.update_files(selected_path, full_scan=True)
                 else:
                     QMessageBox.warning(
@@ -256,11 +285,21 @@ class MainWindow(QMainWindow):
 
     def on_files_ready(self, files, total_size, scan_time):
         """Handler for when file scanning is complete."""
+        logger.log_scan_results(self.current_scan_path, len(files), total_size, scan_time)
+        
         # Update visualization dashboard with the new file data
-        self.visualization_dashboard.update_data(files, self.current_scan_path)
+        try:
+            self.visualization_dashboard.update_data(files, self.current_scan_path)
+            logger.debug("Visualization dashboard updated successfully")
+        except Exception as e:
+            logger.error("Failed to update visualization dashboard", e)
         
         # Update management dashboard too
-        self.management_dashboard.update_data(files)
+        try:
+            self.management_dashboard.update_data(files)
+            logger.debug("Management dashboard updated successfully")
+        except Exception as e:
+            logger.error("Failed to update management dashboard", e)
         
         # Update status with scan results
         self.update_status(f"Scanned {len(files)} files ({scan_time:.2f}s)")
@@ -273,7 +312,14 @@ class MainWindow(QMainWindow):
         """Toggle between light and dark themes."""
         current_theme = theme_manager.get_current_theme()
         new_theme = "dark" if current_theme == "light" else "light"
+        
+        logger.log_ui_action("theme_toggle", "theme_button", {
+            "from": current_theme, 
+            "to": new_theme
+        })
+        
         theme_manager.apply_theme(new_theme)
+        settings.set_theme(new_theme)
 
         # Update button icon and tooltip
         if new_theme == "dark":
@@ -300,3 +346,86 @@ class MainWindow(QMainWindow):
                     padding: 5px 0px;
                 }
             """)
+    
+    def setup_recent_directories(self):
+        """Setup the recent directories dropdown."""
+        self.recent_dirs_combo.clear()
+        self.recent_dirs_combo.addItem("Recent Directories...", "")
+        
+        recent_dirs = settings.get_recent_directories()
+        for directory in recent_dirs:
+            # Shorten path for display but keep full path as data
+            display_name = self.shorten_path(directory)
+            self.recent_dirs_combo.addItem(display_name, directory)
+        
+        if not recent_dirs:
+            self.recent_dirs_combo.addItem("(No recent directories)", "")
+            self.recent_dirs_combo.setEnabled(False)
+        else:
+            self.recent_dirs_combo.setEnabled(True)
+        
+        logger.debug(f"Setup recent directories: {len(recent_dirs)} items")
+    
+    def shorten_path(self, path: str, max_length: int = 50) -> str:
+        """Shorten a path for display in the dropdown."""
+        if len(path) <= max_length:
+            return path
+        
+        # Try to keep the last part of the path
+        parts = path.split('/')
+        if len(parts) > 2:
+            return f".../{'/'.join(parts[-2:])}"
+        elif len(parts) == 2:
+            return f".../{parts[-1]}"
+        else:
+            return path[:max_length-3] + "..."
+    
+    def on_recent_directory_selected(self, display_text: str):
+        """Handle selection from recent directories dropdown."""
+        if not display_text or display_text in ["Recent Directories...", "(No recent directories)"]:
+            return
+        
+        # Get the actual path from the combo box data
+        current_index = self.recent_dirs_combo.currentIndex()
+        if current_index > 0:  # Skip the first placeholder item
+            actual_path = self.recent_dirs_combo.itemData(current_index)
+            if actual_path and actual_path != "":
+                logger.log_ui_action("recent_directory_selected", "recent_dirs_combo", {
+                    "path": actual_path,
+                    "display": display_text
+                })
+                
+                # Set the new root directory in the tree
+                if self.directory_tree.set_root_directory(actual_path):
+                    self.current_scan_path = actual_path
+                    settings.set_last_directory(actual_path)
+                    settings.add_recent_directory(actual_path)  # Move to front
+                    
+                    self.update_status(f"Selected recent directory: {actual_path}")
+                    
+                    # Auto-scan the directory
+                    logger.info(f"Starting scan of recent directory: {actual_path}")
+                    self.file_table.update_files(actual_path, full_scan=True)
+                    
+                    # Refresh the dropdown to reflect new order
+                    self.setup_recent_directories()
+                else:
+                    # Directory not accessible, remove from recent list
+                    logger.warning(f"Recent directory not accessible: {actual_path}")
+                    QMessageBox.warning(
+                        self,
+                        "Directory Not Found",
+                        f"The directory is no longer accessible:\n{actual_path}\n\n"
+                        "It will be removed from recent directories."
+                    )
+                    # Remove from recent directories (settings class should handle this)
+                    recent = settings.get_recent_directories()
+                    if actual_path in recent:
+                        recent.remove(actual_path)
+                        settings.set("recent_directories", recent)
+                        settings.save()
+                    self.setup_recent_directories()
+    
+    def update_recent_directories(self):
+        """Update the recent directories dropdown after a new directory is added."""
+        self.setup_recent_directories()
