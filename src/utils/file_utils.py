@@ -4,9 +4,7 @@
 import math
 import mimetypes
 import os
-import time
 from datetime import datetime
-from pathlib import Path
 
 
 def format_size(size_bytes):
@@ -23,7 +21,7 @@ def format_size(size_bytes):
         return "0 B"
 
     size_names = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-    i = int(math.floor(math.log(max(size_bytes, 1), 1024)))
+    i = math.floor(math.log(max(size_bytes, 1), 1024))
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
 
@@ -58,7 +56,7 @@ def get_file_type(file_path):
     # Try to guess the mime type
     mime_type, _ = mimetypes.guess_type(file_path)
     if mime_type:
-        return mime_type.split('/')[1].upper()
+        return mime_type.split("/")[1].upper()
 
     return "FILE"
 
@@ -72,7 +70,7 @@ def scan_directory(directory_path, recursive=False):
         recursive: Whether to scan subdirectories
 
     Returns:
-        Tuple of (file_list, total_size) where file_list is a list of dictionaries 
+        Tuple of (file_list, total_size) where file_list is a list of dictionaries
         with file information and total_size is the sum of all file sizes
     """
     file_list = []
@@ -98,13 +96,15 @@ def scan_directory(directory_path, recursive=False):
                     modified = datetime.fromtimestamp(stats.st_mtime)
 
                     # Add to the list
-                    file_list.append({
-                        'name': item,
-                        'path': item_path,
-                        'size': size,
-                        'modified': modified,
-                        'type': get_file_type(item_path)
-                    })
+                    file_list.append(
+                        {
+                            "name": item,
+                            "path": item_path,
+                            "size": size,
+                            "modified": modified,
+                            "type": get_file_type(item_path),
+                        }
+                    )
 
                     total_size += size
                 except (PermissionError, FileNotFoundError):
@@ -114,8 +114,7 @@ def scan_directory(directory_path, recursive=False):
             # If it's a directory and we're recursing, process it
             elif os.path.isdir(item_path) and recursive:
                 try:
-                    sub_files, sub_size = scan_directory(
-                        item_path, recursive=True)
+                    sub_files, sub_size = scan_directory(item_path, recursive=True)
                     file_list.extend(sub_files)
                     total_size += sub_size
                 except (PermissionError, FileNotFoundError):

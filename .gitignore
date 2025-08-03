@@ -29,3 +29,6 @@ Thumbs.db
 # Testing
 .coverage
 htmlcov/
+documents/instructions/
+documents/reports/
+tests/visual/screenshots/

@@ -1,0 +1,108 @@
+[project]
+name = "fileanalyzer"
+version = "1.0.0"
+description = "Smart File Management - Duplicate Detection, Large File Analysis, and Archival Recommendations"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pyqt6==6.9.1",
+    "pyqt6-qt6==6.9.1",
+    "pyqt6-sip==13.10.2",
+    "setuptools==80.9.0",
+    "wheel==0.46.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.12.7",
+    "isort>=5.12.0",
+    "pytest>=7.0.0",
+    "pytest-qt>=4.2.0",
+    "black>=22.0.0",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "pytest-timeout>=2.4.0",
+    "pytest-xvfb>=3.1.1",
+]
+charts = [
+    "matplotlib>=3.5.0",
+    "numpy>=1.21.0",
+]
+# svg = [
+#     # pyqt6-svg>=6.9.1  # Package not available in registry - using local SVG files instead
+# ]
+
+[project.urls]
+Homepage = "https://github.com/fileanalyzer/FileAnalyzer"
+Repository = "https://github.com/fileanalyzer/FileAnalyzer.git"
+Issues = "https://github.com/fileanalyzer/FileAnalyzer/issues"
+
+[project.scripts]
+fileanalyzer = "src.main:main"
+file-analyzer = "src.main:main"
+
+[project.gui-scripts]
+fileanalyzer-gui = "src.main:main"
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "RUF"]
+extend-select = ["I", "N", "UP", "RUF"]
+ignore = ["E501", "N802"]  # Line too long, function name should be lowercase (PyQt methods)
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--color=yes",
+]
+markers = [
+    "unit: Unit tests for individual components",
+    "integration: Integration tests for component interactions",
+    "visual: Visual regression tests for UI components",
+    "slow: Tests that take longer than usual to execute",
+    "gui: Tests requiring GUI components and display",
+    "headless: Tests that can run without display",
+]
+qt_api = "pyqt6"
+timeout = 60
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "tests/*",
+    "venv/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+

@@ -4,11 +4,11 @@
 import math
 from collections import defaultdict
 
-from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QBrush, QColor, QPainter, QPen
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt6.QtCore import QRect, Qt, pyqtSignal
+from PyQt6.QtGui import QColor, QPainter
+from PyQt6.QtWidgets import QHBoxLayout, QWidget
 
-from src.utils.file_utils import format_size
+from .themes.styles import FILE_COLORS, ModernTheme
 
 
 class FileTypeBar(QWidget):
@@ -29,25 +29,8 @@ class FileTypeBar(QWidget):
         # Initialize data structures
         self.data = {}  # Dictionary of {type: size}
         self.total_size = 0
-        self.colors = {
-            # Pre-defined colors for common file types
-            "EXE": QColor(52, 152, 219),  # Blue
-            "DLL": QColor(46, 204, 113),  # Green
-            "PDF": QColor(231, 76, 60),   # Red
-            "DOC": QColor(155, 89, 182),  # Purple
-            "DOCX": QColor(155, 89, 182),  # Purple
-            "XLS": QColor(46, 204, 113),  # Green
-            "XLSX": QColor(46, 204, 113),  # Green
-            "JPG": QColor(241, 196, 15),  # Yellow
-            "JPEG": QColor(241, 196, 15),  # Yellow
-            "PNG": QColor(243, 156, 18),  # Orange
-            "TXT": QColor(149, 165, 166),  # Gray
-            "ZIP": QColor(52, 73, 94),    # Dark Blue
-            "RAR": QColor(52, 73, 94),    # Dark Blue
-            "MP3": QColor(142, 68, 173),  # Purple
-            "MP4": QColor(41, 128, 185),  # Blue
-            "OTHER": QColor(189, 195, 199)  # Light Gray
-        }
+        # Use theme colors for consistent styling
+        self.colors = FILE_COLORS
 
         # Setup layout
         self.layout = QHBoxLayout(self)
@@ -59,7 +42,7 @@ class FileTypeBar(QWidget):
             "DLL": 2000000,
             "PDF": 500000,
             "DOC": 200000,
-            "OTHER": 1000000
+            "OTHER": 1000000,
         }
 
     def update_data(self, file_list):
@@ -75,15 +58,14 @@ class FileTypeBar(QWidget):
 
         # Calculate total size for each file type
         for file in file_list:
-            file_type = file['type']
-            size = file['size']
+            file_type = file["type"]
+            size = file["size"]
 
             self.data[file_type] += size
             self.total_size += size
 
         # Sort and limit to top 10 file types
-        sorted_types = sorted(
-            self.data.items(), key=lambda x: x[1], reverse=True)
+        sorted_types = sorted(self.data.items(), key=lambda x: x[1], reverse=True)
 
         # If we have more than 10 types, combine the smallest into "OTHER"
         if len(sorted_types) > 10:
@@ -105,16 +87,16 @@ class FileTypeBar(QWidget):
 
         # If no data, just draw a placeholder
         if not self.data and not self.test_data:
-            painter.fillRect(self.rect(), QColor(245, 245, 245))
-            painter.setPen(QColor(150, 150, 150))
+            painter.fillRect(self.rect(), QColor(ModernTheme.LIGHT_GRAY.name()))
+            painter.setPen(QColor(ModernTheme.DARK_GRAY.name()))
             painter.drawText(
-                self.rect(), Qt.AlignmentFlag.AlignCenter, "No data available")
+                self.rect(), Qt.AlignmentFlag.AlignCenter, "No data available"
+            )
             return
 
         # Use test data if no real data is available
         data = self.data if self.data else self.test_data
-        total = self.total_size if self.total_size else sum(
-            self.test_data.values())
+        total = self.total_size if self.total_size else sum(self.test_data.values())
 
         # Draw the segments
         x = 0
@@ -128,8 +110,7 @@ class FileTypeBar(QWidget):
             sorted(data.items(), key=lambda x: x[1], reverse=True)
         ):
             # Calculate the width of this segment
-            segment_width = math.floor(
-                (size / total) * width) if total > 0 else 0
+            segment_width = math.floor((size / total) * width) if total > 0 else 0
 
             # If this is the last segment, make sure it extends to the end
             if i == len(data) - 1:
@@ -142,11 +123,13 @@ class FileTypeBar(QWidget):
             painter.fillRect(x, 0, segment_width, height, color)
 
             # Store segment info for mouse events
-            self.segments.append({
-                'type': file_type,
-                'rect': QRect(x, 0, segment_width, height),
-                'size': size
-            })
+            self.segments.append(
+                {
+                    "type": file_type,
+                    "rect": QRect(x, 0, segment_width, height),
+                    "size": size,
+                }
+            )
 
             # Draw the text if the segment is wide enough
             if segment_width > 60:
@@ -154,8 +137,7 @@ class FileTypeBar(QWidget):
                 # Calculate text width and see if it fits
                 text = f"{file_type} ({size / total:.1%})"
                 text_rect = QRect(x + 5, 0, segment_width - 10, height)
-                painter.drawText(
-                    text_rect, Qt.AlignmentFlag.AlignVCenter, text)
+                painter.drawText(text_rect, Qt.AlignmentFlag.AlignVCenter, text)
 
             # Move x for the next segment
             x += segment_width
@@ -164,10 +146,10 @@ class FileTypeBar(QWidget):
         """
         Handle mouse clicks to identify which segment was clicked.
         """
-        if not hasattr(self, 'segments'):
+        if not hasattr(self, "segments"):
             return
 
         for segment in self.segments:
-            if segment['rect'].contains(event.position().toPoint()):
-                self.bar_clicked.emit(segment['type'])
+            if segment["rect"].contains(event.position().toPoint()):
+                self.bar_clicked.emit(segment["type"])
                 break

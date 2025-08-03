@@ -1,20 +1,17 @@
 {
     "editor.fontFamily": "'Roboto Mono', Consolas, 'Courier New', monospace",
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    // "python.linting.enabled": true,
-    // "python.linting.pylintEnabled": true,
-    // "python.linting.flake8Enabled": false,
-    // "python.linting.pylintArgs": [
-    //     "--init-hook='import sys; sys.path.append(\"src\")'"
-    // ],
-    // "python.formatting.provider": "autopep8",
-    // "python.formatting.autopep8Args": [
-    //     "--max-line-length=100",
-    //     "--aggressive"
-    // ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.flake8Enabled": false,
+    "python.formatting.provider": "autopep8",
+    "python.formatting.autopep8Args": [
+        "--max-line-length=100",
+        "--aggressive"
+    ],
     "python.testing.unittestEnabled": true,
     "python.testing.pytestEnabled": false,
-    // "python.testing.nosetestsEnabled": false,
+    "python.testing.nosetestsEnabled": false,
     "python.testing.unittestArgs": [
         "-v",
         "-s",
@@ -41,5 +38,5 @@
     "pylint.importStrategy": "fromEnvironment",
     "pylint.args": [
         "--init-hook='import sys; sys.path.append(\"src\")'"
-    ],
+    ]
 }
