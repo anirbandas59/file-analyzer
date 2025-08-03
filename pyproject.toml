@@ -8,6 +8,8 @@ dependencies = [
     "pyqt6==6.9.1",
     "pyqt6-qt6==6.9.1",
     "pyqt6-sip==13.10.2",
+    "setuptools==80.9.0",
+    "wheel==0.46.1",
 ]
 
 [project.optional-dependencies]

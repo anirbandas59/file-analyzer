@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.left_panel.add_content_widget(self.directory_tree)
         self.left_panel.add_content_widget(self.scan_button)
 
-        # Create and setup the right panel (content area)
+        # Create and set up the right panel (content area)
         self.right_panel = CardWidget()
         self.right_layout = QVBoxLayout(self.right_panel)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
@@ -71,20 +71,13 @@ class MainWindow(QMainWindow):
         # Setup files tab
         self.files_layout = QVBoxLayout(self.files_tab)
 
-        # Add search bar and theme toggle
+        # Add search bar
         self.search_layout = QHBoxLayout()
-
-        # Theme toggle button
-        self.theme_toggle_btn = ModernButton("🌙", "secondary")
-        self.theme_toggle_btn.setMaximumWidth(40)
-        self.theme_toggle_btn.setToolTip("Toggle Dark/Light Theme")
-        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
 
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search files...")
         self.search_input.textChanged.connect(self.on_search_text_changed)
 
-        self.search_layout.addWidget(self.theme_toggle_btn)
         self.search_layout.addStretch(1)
         self.search_layout.addWidget(self.search_input)
 
@@ -132,9 +125,34 @@ class MainWindow(QMainWindow):
         # Set initial sizes for the splitter (30% left, 70% right)
         self.splitter.setSizes([300, 700])
 
-        # Create main layout with the splitter
+        # Create header with theme toggle
+        self.header_layout = QHBoxLayout()
+        
+        # App title
+        self.title_label = QLabel("File System Analyzer")
+        self.title_label.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2c3e50;
+                padding: 5px 0px;
+            }
+        """)
+        
+        # Theme toggle button
+        self.theme_toggle_btn = ModernButton("🌙", "secondary")
+        self.theme_toggle_btn.setMaximumWidth(40)
+        self.theme_toggle_btn.setToolTip("Toggle Dark/Light Theme")
+        self.theme_toggle_btn.clicked.connect(self.toggle_theme)
+        
+        self.header_layout.addWidget(self.title_label)
+        self.header_layout.addStretch(1)
+        self.header_layout.addWidget(self.theme_toggle_btn)
+
+        # Create main layout with header and splitter
         self.main_layout = QVBoxLayout(self.central_widget)
         self.main_layout.setContentsMargins(10, 10, 10, 10)
+        self.main_layout.addLayout(self.header_layout)
         self.main_layout.addWidget(self.splitter)
 
         # Setup status bar
@@ -149,6 +167,7 @@ class MainWindow(QMainWindow):
         self.visualization_dashboard.drill_down_requested.connect(
             self.on_dashboard_drill_down
         )
+        self.file_table.files_ready.connect(self.on_files_ready)
 
         # Initial status message
         self.update_status("Ready - Select a directory to analyze")
@@ -185,6 +204,17 @@ class MainWindow(QMainWindow):
             # Navigate to directory (future implementation)
             pass
 
+    def on_files_ready(self, files, total_size, scan_time):
+        """Handler for when file scanning is complete."""
+        # Update visualization dashboard with the new file data
+        self.visualization_dashboard.update_data(files, self.current_scan_path)
+        
+        # Update management dashboard too
+        self.management_dashboard.update_data(files)
+        
+        # Update status with scan results
+        self.update_status(f"Scanned {len(files)} files ({scan_time:.2f}s)")
+
     def update_status(self, message):
         """Updates the status bar with a message."""
         self.status_label.setText(message)
@@ -199,6 +229,24 @@ class MainWindow(QMainWindow):
         if new_theme == "dark":
             self.theme_toggle_btn.setText("☀️")
             self.theme_toggle_btn.setToolTip("Switch to Light Theme")
+            # Update title color for dark theme
+            self.title_label.setStyleSheet("""
+                QLabel {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #e8eaed;
+                    padding: 5px 0px;
+                }
+            """)
         else:
             self.theme_toggle_btn.setText("🌙")
             self.theme_toggle_btn.setToolTip("Switch to Dark Theme")
+            # Update title color for light theme
+            self.title_label.setStyleSheet("""
+                QLabel {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #2c3e50;
+                    padding: 5px 0px;
+                }
+            """)

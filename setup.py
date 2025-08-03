@@ -28,7 +28,7 @@ def get_version():
 version = get_version()
 
 setup(
-    name="fileanalyzer",
+    name="File analyzer",
     version=version,
     description="Smart File Management - Large File Analyzer, File Age Analyzer, Duplicate Finder, and Archival Recommendations.",
     long_description=read_long_description(),

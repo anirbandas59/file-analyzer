@@ -20,6 +20,9 @@ class FileTableView(QTableView):
     Table view for displaying files in the selected directory.
     """
 
+    # Signal emitted when files are ready
+    files_ready = pyqtSignal(list, int, float)  # files, total_size, scan_time
+
     def __init__(self):
         super().__init__()
 
@@ -71,27 +74,13 @@ class FileTableView(QTableView):
         current_sort_order = self.horizontalHeader().sortIndicatorOrder()
         self.model.sort(current_sort_column, current_sort_order)
 
-        # Get the parent window to update status and visualization
-        main_window = self.window()
-        if hasattr(main_window, "update_status"):
-            size_str = format_size(total_size)
-            main_window.update_status(
-                f"{len(file_list):,} files, {size_str} total, scan completed in {scan_time:.2f}s"
-            )
-
         # Update the visualization bar if available
+        main_window = self.window()
         if hasattr(main_window, "file_type_bar"):
             main_window.file_type_bar.update_data(file_list)
 
-        # Update the dashboard if available
-        if hasattr(main_window, "visualization_dashboard"):
-            current_path = getattr(main_window, "current_scan_path", "")
-            main_window.visualization_dashboard.update_data(file_list, current_path)
-
-        # Update the management dashboard if available
-        if hasattr(main_window, "management_dashboard"):
-            current_path = getattr(main_window, "current_scan_path", "")
-            main_window.management_dashboard.update_data(file_list, current_path)
+        # Emit files_ready signal for main window to handle dashboard updates
+        self.files_ready.emit(file_list, total_size, scan_time)
 
     def filter_files(self, text):
         """Filter files based on search text."""

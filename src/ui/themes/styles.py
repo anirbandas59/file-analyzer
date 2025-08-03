@@ -135,7 +135,7 @@ class Typography:
     """Typography constants for consistent text styling."""
 
     # Font Families
-    MAIN_FONT = "Arial, sans-serif"
+    MAIN_FONT = "Roboto, 'Segoe UI', Arial, sans-serif"
     MONO_FONT = "Consolas, Monaco, monospace"
 
     # Font Sizes

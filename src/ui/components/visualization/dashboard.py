@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 from ...themes.styles import ModernTheme, Spacing, Typography
 from ..card_widget import CardWidget, StatsCard, TitleCard
 from ..modern_button import ModernButton
-from .charts.pie_chart import FileTypePieChart
+from .charts import DirectoryTreeChart, FileAgeChart, FileTypePieChart, SizeDistributionChart
 from .services.data_service import VisualizationDataService
 
 
@@ -148,52 +148,21 @@ class VisualizationDashboard(QWidget):
         self.charts["file_type"] = self.file_type_chart
         self.charts_layout.addWidget(self.file_type_chart, 0, 0)
 
-        # Placeholder for additional charts
-        self.create_placeholder_charts()
+        # Directory structure chart
+        self.directory_chart = DirectoryTreeChart()
+        self.charts["directory_structure"] = self.directory_chart
+        self.charts_layout.addWidget(self.directory_chart, 0, 1)
 
-    def create_placeholder_charts(self):
-        """Create placeholder cards for future chart implementations."""
-        # Directory structure placeholder
-        dir_placeholder = self.create_chart_placeholder(
-            "Directory Structure",
-            "Interactive treemap visualization will be implemented next",
-        )
-        self.charts_layout.addWidget(dir_placeholder, 0, 1)
+        # File size distribution chart
+        self.size_chart = SizeDistributionChart()
+        self.charts["size_distribution"] = self.size_chart
+        self.charts_layout.addWidget(self.size_chart, 1, 0)
 
-        # File size distribution placeholder
-        size_placeholder = self.create_chart_placeholder(
-            "File Size Distribution", "Bar chart showing file size ranges"
-        )
-        self.charts_layout.addWidget(size_placeholder, 1, 0)
+        # File age analysis chart
+        self.age_chart = FileAgeChart()
+        self.charts["file_age"] = self.age_chart
+        self.charts_layout.addWidget(self.age_chart, 1, 1)
 
-        # File age analysis placeholder
-        age_placeholder = self.create_chart_placeholder(
-            "File Age Analysis", "Timeline of file modification dates"
-        )
-        self.charts_layout.addWidget(age_placeholder, 1, 1)
-
-    def create_chart_placeholder(self, title: str, description: str) -> CardWidget:
-        """Create a placeholder card for future chart implementations."""
-        placeholder = TitleCard(title, "Coming soon")
-
-        placeholder_content = QLabel(description)
-        placeholder_content.setStyleSheet(f"""
-        QLabel {{
-            color: {ModernTheme.DARK_GRAY.name()};
-            font-size: {Typography.FONT_MD};
-            padding: {Spacing.XL}px;
-            text-align: center;
-            border: 2px dashed {ModernTheme.MEDIUM_GRAY.name()};
-            border-radius: 8px;
-            background: transparent;
-        }}
-        """)
-        placeholder_content.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        placeholder_content.setWordWrap(True)
-
-        placeholder.add_content_widget(placeholder_content)
-
-        return placeholder
 
     def setup_signals(self):
         """Connect chart signals to dashboard handlers."""
@@ -203,6 +172,24 @@ class VisualizationDashboard(QWidget):
             self.file_type_chart.export_requested.connect(
                 self.on_chart_export_requested
             )
+
+        # Connect directory chart signals
+        if hasattr(self, "directory_chart"):
+            self.directory_chart.item_clicked.connect(self.on_chart_item_clicked)
+            self.directory_chart.export_requested.connect(
+                self.on_chart_export_requested
+            )
+            self.directory_chart.drill_down_requested.connect(
+                lambda path, data: self.drill_down_requested.emit(path, data)
+            )
+
+        # Connect size distribution chart signals
+        if hasattr(self, "size_chart"):
+            self.size_chart.export_requested.connect(self.on_chart_export_requested)
+
+        # Connect file age chart signals
+        if hasattr(self, "age_chart"):
+            self.age_chart.export_requested.connect(self.on_chart_export_requested)
 
     def update_data(self, file_list: list[dict[str, Any]], directory_path: str = ""):
         """
@@ -252,7 +239,18 @@ class VisualizationDashboard(QWidget):
         file_type_data = self.data_service.get_file_type_data()
         self.file_type_chart.update_data(file_type_data, metadata)
 
-        # TODO: Update other charts when implemented
+        # Update directory structure chart
+        directory_hierarchy = self.data_service.get_directory_hierarchy()
+        if directory_hierarchy:
+            self.directory_chart.update_data(directory_hierarchy, metadata)
+
+        # Update file size distribution chart
+        size_distribution = self.data_service.get_file_size_distribution()
+        self.size_chart.update_data(size_distribution, metadata)
+
+        # Update file age analysis chart
+        age_distribution = self.data_service.get_file_age_distribution()
+        self.age_chart.update_data(age_distribution, metadata)
 
     def on_chart_item_clicked(self, item_id: str, data: dict[str, Any]):
         """Handle chart item click events."""

@@ -41,9 +41,9 @@ echo Python version check passed
 echo.
 
 :: Create virtual environment if it doesn't exist
-if not exist "venv\" (
+if not exist ".venv\" (
     echo Creating virtual environment...
-    python -m venv venv
+    python -m venv .venv
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment
         pause
@@ -56,7 +56,7 @@ if not exist "venv\" (
 
 :: Activate virtual environment
 echo Activating virtual environment...
-call venv\Scripts\activate.bat
+call .venv\Scripts\activate.bat
 if errorlevel 1 (
     echo ERROR: Failed to activate virtual environment
     pause

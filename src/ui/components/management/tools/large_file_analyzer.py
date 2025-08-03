@@ -144,8 +144,8 @@ class LargeFileItemWidget(CardWidget):
             FileSizeCategory.SMALL: ModernTheme.SUCCESS.name(),
             FileSizeCategory.MEDIUM: ModernTheme.WARNING.name(),
             FileSizeCategory.LARGE: ModernTheme.ERROR.name(),
-            FileSizeCategory.HUGE: ModernTheme.DANGER.name(),
-            FileSizeCategory.MASSIVE: ModernTheme.DARK_RED.name(),
+            FileSizeCategory.HUGE: ModernTheme.ERROR.name(),
+            FileSizeCategory.MASSIVE: ModernTheme.ERROR.name(),
         }
         return colors.get(self.file_info.size_category, ModernTheme.DARK_GRAY.name())
 
