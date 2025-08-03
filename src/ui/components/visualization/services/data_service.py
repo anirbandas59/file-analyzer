@@ -66,8 +66,13 @@ class VisualizationDataService:
 
     def get_file_size_distribution(self) -> FileDistributionData:
         """Get file size distribution data for bar charts."""
+        from src.utils.logger import logger
+        
         if not self.current_files:
+            logger.debug("get_file_size_distribution: No files to analyze")
             return FileDistributionData([], [], [], [])
+
+        logger.debug(f"get_file_size_distribution: Processing {len(self.current_files)} files")
 
         # Define size ranges (in bytes)
         ranges = [
@@ -96,6 +101,10 @@ class VisualizationDataService:
             count / total_files * 100 if total_files > 0 else 0
             for count in range_counts
         ]
+        
+        total_size_files = sum(range_counts)
+        logger.debug(f"Size distribution: {total_size_files} files categorized")
+        logger.debug(f"Size distribution counts: {range_counts}")
 
         return FileDistributionData(
             size_ranges=[r[2] for r in ranges],
@@ -113,9 +122,13 @@ class VisualizationDataService:
 
     def get_file_age_distribution(self) -> FileAgeData:
         """Get file age distribution data."""
+        from src.utils.logger import logger
+        
         if not self.current_files:
+            logger.debug("get_file_age_distribution: No files to analyze")
             return FileAgeData([], [], [], [])
 
+        logger.debug(f"get_file_age_distribution: Processing {len(self.current_files)} files")
         now = datetime.now()
 
         # Define age ranges
@@ -131,16 +144,31 @@ class VisualizationDataService:
         # Count files in each age range
         range_counts = [0] * len(ranges)
         range_sizes = [0] * len(ranges)
+        processed_files = 0
+        error_files = 0
 
         for file in self.current_files:
-            file_modified = file["modified"]
-            age = now - file_modified
+            try:
+                file_modified = file["modified"]
+                
+                # Validate that we have a datetime object
+                if not isinstance(file_modified, datetime):
+                    logger.warning(f"File age analysis: Invalid datetime type for file {file.get('name', 'unknown')}: {type(file_modified)}")
+                    error_files += 1
+                    continue
+                
+                age = now - file_modified
+                processed_files += 1
 
-            for i, (min_age, max_age, _) in enumerate(ranges):
-                if min_age <= age < max_age:
-                    range_counts[i] += 1
-                    range_sizes[i] += file["size"]
-                    break
+                for i, (min_age, max_age, _) in enumerate(ranges):
+                    if min_age <= age < max_age:
+                        range_counts[i] += 1
+                        range_sizes[i] += file["size"]
+                        break
+                        
+            except Exception as e:
+                logger.error(f"Error processing file age for {file.get('name', 'unknown')}: {e}")
+                error_files += 1
 
         # Calculate percentages
         total_files = len(self.current_files)
@@ -148,6 +176,10 @@ class VisualizationDataService:
             count / total_files * 100 if total_files > 0 else 0
             for count in range_counts
         ]
+        
+        total_age_files = sum(range_counts)
+        logger.debug(f"File age distribution: {processed_files} processed, {error_files} errors, {total_age_files} categorized")
+        logger.debug(f"Age distribution counts: {range_counts}")
 
         return FileAgeData(
             age_ranges=[r[2] for r in ranges],

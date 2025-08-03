@@ -71,6 +71,8 @@ class SizeDistributionChart(BaseChart):
 
     def refresh_chart(self):
         """Refresh the chart display."""
+        from src.utils.logger import logger
+        
         # Clear existing bars
         for i in reversed(range(self.bars_layout.count())):
             child = self.bars_layout.itemAt(i).widget()
@@ -78,8 +80,11 @@ class SizeDistributionChart(BaseChart):
                 child.setParent(None)
 
         if not self.distribution_data or not any(self.distribution_data.file_counts):
+            logger.debug(f"Size distribution chart: No data to display - data exists: {bool(self.distribution_data)}, counts: {self.distribution_data.file_counts if self.distribution_data else 'None'}")
             self.show_no_data_message("No file size data available")
             return
+            
+        logger.debug(f"Size distribution chart: Displaying {len(self.distribution_data.size_ranges)} size ranges")
 
         # Find max count for scaling
         max_count = max(self.distribution_data.file_counts) if self.distribution_data.file_counts else 1
@@ -176,6 +181,8 @@ class FileAgeChart(BaseChart):
 
     def refresh_chart(self):
         """Refresh the chart display."""
+        from src.utils.logger import logger
+        
         # Clear existing bars
         for i in reversed(range(self.bars_layout.count())):
             child = self.bars_layout.itemAt(i).widget()
@@ -183,8 +190,11 @@ class FileAgeChart(BaseChart):
                 child.setParent(None)
 
         if not self.age_data or not any(self.age_data.file_counts):
+            logger.debug(f"File age chart: No data to display - data exists: {bool(self.age_data)}, counts: {self.age_data.file_counts if self.age_data else 'None'}")
             self.show_no_data_message("No file age data available")
             return
+            
+        logger.debug(f"File age chart: Displaying {len(self.age_data.age_ranges)} age ranges")
 
         # Find max count for scaling
         max_count = max(self.age_data.file_counts) if self.age_data.file_counts else 1

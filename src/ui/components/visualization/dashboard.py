@@ -233,23 +233,32 @@ class VisualizationDashboard(QWidget):
 
     def update_charts(self):
         """Update all chart widgets with new data."""
+        from src.utils.logger import logger
+        
         metadata = self.data_service.get_metadata()
+        logger.debug(f"Dashboard update_charts: Processing {metadata.total_files} files")
 
         # Update file type pie chart
         file_type_data = self.data_service.get_file_type_data()
+        logger.debug(f"Dashboard update_charts: File type data has {len(file_type_data)} types")
         self.file_type_chart.update_data(file_type_data, metadata)
 
         # Update directory structure chart
         directory_hierarchy = self.data_service.get_directory_hierarchy()
         if directory_hierarchy:
+            logger.debug(f"Dashboard update_charts: Directory hierarchy available")
             self.directory_chart.update_data(directory_hierarchy, metadata)
+        else:
+            logger.debug(f"Dashboard update_charts: No directory hierarchy data")
 
         # Update file size distribution chart
         size_distribution = self.data_service.get_file_size_distribution()
+        logger.debug(f"Dashboard update_charts: Size distribution updating")
         self.size_chart.update_data(size_distribution, metadata)
 
         # Update file age analysis chart
         age_distribution = self.data_service.get_file_age_distribution()
+        logger.debug(f"Dashboard update_charts: Age distribution updating")
         self.age_chart.update_data(age_distribution, metadata)
 
     def on_chart_item_clicked(self, item_id: str, data: dict[str, Any]):
