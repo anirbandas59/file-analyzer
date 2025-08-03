@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # File: tests/test_gui.py
 
-from src.ui.visualization import FileTypeBar
-from src.ui.main_window import MainWindow
-from src.ui.file_table import FileTableView
-from src.ui.directory_tree import DirectoryTreeView
 import os
 import sys
 import unittest
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QStandardItemModel
-from PyQt6.QtTest import QTest
 from PyQt6.QtWidgets import QApplication
+
+from src.ui.directory_tree import DirectoryTreeView
+from src.ui.file_table import FileTableView
+from src.ui.visualization import FileTypeBar
 
 # Add the src directory to the path
 sys.path.insert(0, os.path.abspath(
@@ -50,23 +48,23 @@ class TestGUIComponents(unittest.TestCase):
     def test_directory_tree_custom_root(self):
         """Test setting custom root directory."""
         import tempfile
-        
+
         tree = DirectoryTreeView()
-        
+
         # Test with temporary directory
         with tempfile.TemporaryDirectory() as temp_dir:
             # Should succeed with valid directory
             result = tree.set_root_directory(temp_dir)
             self.assertTrue(result)
-            
+
             # Verify the root path was set
             root_path = tree.get_root_path()
             self.assertEqual(root_path, temp_dir)
-            
+
         # Test with invalid directory
         result = tree.set_root_directory("/nonexistent/directory")
         self.assertFalse(result)
-        
+
         # Test with None
         result = tree.set_root_directory(None)
         self.assertFalse(result)

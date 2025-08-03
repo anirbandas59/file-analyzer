@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 # File: tests/test_file_utils.py
 
-from src.utils.file_utils import (format_size, get_directory_size,
-                                  get_file_type, scan_directory)
 import os
 import shutil
+
 # Add the src directory to the path
 import sys
 import tempfile
 import unittest
 from datetime import datetime
-from pathlib import Path
+
+from src.utils.file_utils import (
+    format_size,
+    get_directory_size,
+    get_file_type,
+    scan_directory,
+)
 
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..')))
