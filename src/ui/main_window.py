@@ -3,10 +3,12 @@
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
+    QFileDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMessageBox,
     QSplitter,
     QStatusBar,
     QTabWidget,
@@ -51,11 +53,26 @@ class MainWindow(QMainWindow):
         # Create and setup the left panel (directory tree)
         self.left_panel = TitleCard("Directories", "Navigate and select folders")
         self.directory_tree = DirectoryTreeView()
+        
+        # Add button layout for directory controls
+        self.dir_button_layout = QHBoxLayout()
+        self.browse_button = ModernButton("Browse", "secondary")
+        self.browse_button.setToolTip("Select a directory to analyze")
+        self.browse_button.clicked.connect(self.on_browse_clicked)
+        
         self.scan_button = ModernButton("Scan", "primary")
+        self.scan_button.setToolTip("Scan the selected directory")
         self.scan_button.clicked.connect(self.on_scan_clicked)
+        
+        self.dir_button_layout.addWidget(self.browse_button)
+        self.dir_button_layout.addWidget(self.scan_button)
 
         self.left_panel.add_content_widget(self.directory_tree)
-        self.left_panel.add_content_widget(self.scan_button)
+        
+        # Create a widget to hold the button layout
+        self.button_widget = QWidget()
+        self.button_widget.setLayout(self.dir_button_layout)
+        self.left_panel.add_content_widget(self.button_widget)
 
         # Create and set up the right panel (content area)
         self.right_panel = CardWidget()
@@ -177,6 +194,39 @@ class MainWindow(QMainWindow):
         self.current_scan_path = path
         self.update_status(f"Selected directory: {path}")
         self.file_table.update_files(path)
+
+    def on_browse_clicked(self):
+        """Handler for browse button click - opens directory selection dialog."""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
+        
+        # Start from current selected directory, root directory, or home
+        current_path = self.directory_tree.get_selected_path()
+        if not current_path:
+            current_path = self.directory_tree.get_root_path()
+        if current_path:
+            dialog.setDirectory(current_path)
+        
+        if dialog.exec():
+            selected_dirs = dialog.selectedFiles()
+            if selected_dirs:
+                selected_path = selected_dirs[0]
+                
+                # Set the new root directory in the tree
+                if self.directory_tree.set_root_directory(selected_path):
+                    self.current_scan_path = selected_path
+                    self.update_status(f"Selected directory: {selected_path}")
+                    
+                    # Auto-scan the new directory
+                    self.file_table.update_files(selected_path, full_scan=True)
+                else:
+                    QMessageBox.warning(
+                        self,
+                        "Invalid Directory",
+                        f"Cannot access directory: {selected_path}\n"
+                        "Please check permissions and try again."
+                    )
 
     def on_scan_clicked(self):
         """Handler for scan button click."""

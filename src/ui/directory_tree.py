@@ -37,20 +37,52 @@ class DirectoryTreeView(QTreeView):
         # Populate with drives/home directory
         self.populate_tree()
 
-    def populate_tree(self):
+    def populate_tree(self, root_path=None):
         """Populate the directory tree with initial items"""
-        # Use home directory as root
-        home_dir = str(Path.home())
-        root_item = QStandardItem(os.path.basename(home_dir))
-        root_item.setData(home_dir, Qt.ItemDataRole.UserRole)
+        # Use provided root path or default to home directory
+        if root_path is None:
+            root_path = str(Path.home())
+        
+        # Validate the root path
+        if not os.path.exists(root_path) or not os.path.isdir(root_path):
+            root_path = str(Path.home())  # Fallback to home if invalid
+        
+        # Clear existing tree
+        self.model.clear()
+        self.model.setHorizontalHeaderLabels(["Directories"])
+        self.path_dict.clear()
+        
+        root_item = QStandardItem(os.path.basename(root_path) or root_path)
+        root_item.setData(root_path, Qt.ItemDataRole.UserRole)
         self.model.appendRow(root_item)
-        self.path_dict[self.model.indexFromItem(root_item)] = home_dir
+        self.path_dict[self.model.indexFromItem(root_item)] = root_path
 
         # Populate first level subdirectories
-        self.populate_subdirectories(root_item, home_dir)
+        self.populate_subdirectories(root_item, root_path)
 
         # Expand the root item
         self.expand(self.model.indexFromItem(root_item))
+
+    def set_root_directory(self, root_path):
+        """
+        Set a new root directory for the tree view.
+        
+        Args:
+            root_path: Path to the new root directory
+            
+        Returns:
+            bool: True if successful, False if path is invalid
+        """
+        if not root_path or not os.path.exists(root_path) or not os.path.isdir(root_path):
+            return False
+            
+        try:
+            # Check if we have read permissions
+            os.listdir(root_path)
+            self.populate_tree(root_path)
+            return True
+        except PermissionError:
+            return False
 
     def populate_subdirectories(self, parent_item, parent_path):
         """Populate the subdirectories of a given directory"""
@@ -71,21 +103,21 @@ class DirectoryTreeView(QTreeView):
                 parent_item.appendRow(item)
                 self.path_dict[self.model.indexFromItem(item)] = path
 
-            # Check if directory has subdirectories
-            has_subdirs = False
-            try:
-                with os.scandir(path) as subentries:
-                    for subentry in subentries:
-                        if subentry.is_dir() and not subentry.name.startswith("."):
-                            has_subdirs = True
-                            break
-            except (PermissionError, FileNotFoundError):
-                pass
+                # Check if this directory has subdirectories
+                has_subdirs = False
+                try:
+                    with os.scandir(path) as subentries:
+                        for subentry in subentries:
+                            if subentry.is_dir() and not subentry.name.startswith("."):
+                                has_subdirs = True
+                                break
+                except (PermissionError, FileNotFoundError):
+                    pass
 
-            # If directory has subdirectories, add a placeholder item
-            if has_subdirs:
-                placeholder = QStandardItem("Loading...")
-                item.appendRow(placeholder)
+                # If directory has subdirectories, add a placeholder item
+                if has_subdirs:
+                    placeholder = QStandardItem("Loading...")
+                    item.appendRow(placeholder)
 
         except (PermissionError, FileNotFoundError):
             # If we cannot access the directory, just return
@@ -120,3 +152,10 @@ class DirectoryTreeView(QTreeView):
         # We only care about the first column
         index = next(idx for idx in indexes if idx.column() == 0)
         return self.path_dict.get(index)
+    
+    def get_root_path(self):
+        """Returns the current root directory path"""
+        if self.model.rowCount() > 0:
+            root_index = self.model.index(0, 0)
+            return self.path_dict.get(root_index)
+        return str(Path.home())

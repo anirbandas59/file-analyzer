@@ -47,6 +47,30 @@ class TestGUIComponents(unittest.TestCase):
         # Test that the home directory is in the tree
         self.assertGreater(tree.model.rowCount(), 0)
 
+    def test_directory_tree_custom_root(self):
+        """Test setting custom root directory."""
+        import tempfile
+        
+        tree = DirectoryTreeView()
+        
+        # Test with temporary directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Should succeed with valid directory
+            result = tree.set_root_directory(temp_dir)
+            self.assertTrue(result)
+            
+            # Verify the root path was set
+            root_path = tree.get_root_path()
+            self.assertEqual(root_path, temp_dir)
+            
+        # Test with invalid directory
+        result = tree.set_root_directory("/nonexistent/directory")
+        self.assertFalse(result)
+        
+        # Test with None
+        result = tree.set_root_directory(None)
+        self.assertFalse(result)
+
     def test_file_table(self):
         """Test the file table view."""
         table = FileTableView()
