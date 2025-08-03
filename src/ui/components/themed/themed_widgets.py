@@ -120,14 +120,13 @@ class ThemedIcon(QLabel):
 
     def _update_icon(self):
         """Update icon based on current theme"""
-        theme_name = theme_provider.current_theme
-        icon_data = IconSystem.ICONS.get(self.icon_name, {})
-        icon_text = icon_data.get(theme_name, icon_data.get("unicode", "?"))
-
-        self.setText(icon_text)
-        font = QFont()
-        font.setPointSize(self.icon_size - 4)
-        self.setFont(font)
+        from ...themes.icon_manager import icon_manager
+        
+        # Use the new icon manager for proper SVG icons
+        icon = icon_manager.get_icon(self.icon_name, self.icon_size)
+        pixmap = icon.pixmap(self.icon_size, self.icon_size)
+        self.setPixmap(pixmap)
+        self.setText("")  # Clear any text since we're using pixmap
 
     def _on_theme_changed(self, theme_name: str):
         """Handle theme changes"""

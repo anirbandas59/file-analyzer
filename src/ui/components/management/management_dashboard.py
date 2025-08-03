@@ -58,7 +58,7 @@ class ManagementOverview(QWidget):
 
         # Duplicate Finder Tool
         duplicate_card = self.create_tool_card(
-            "🔍 Duplicate Finder",
+            "Duplicate Finder",
             "Find and remove duplicate files to free up disk space",
             "Find exact duplicates using content analysis",
             "duplicate_finder",
@@ -66,7 +66,7 @@ class ManagementOverview(QWidget):
 
         # Large Files Tool
         large_files_card = self.create_tool_card(
-            "📊 Large Files",
+            "Large Files",
             "Identify the largest files consuming disk space",
             "Analyze file sizes and get cleanup recommendations",
             "large_files",
@@ -74,7 +74,7 @@ class ManagementOverview(QWidget):
 
         # File Age Analysis Tool
         age_analysis_card = self.create_tool_card(
-            "📅 File Age Analysis",
+            "File Age Analysis",
             "Analyze file ages and get archival recommendations",
             "Find old unused files ready for archiving",
             "age_analysis",

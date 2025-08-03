@@ -134,9 +134,9 @@ class Spacing:
 class Typography:
     """Typography constants for consistent text styling."""
 
-    # Font Families
-    MAIN_FONT = "Roboto, 'Segoe UI', Arial, sans-serif"
-    MONO_FONT = "Consolas, Monaco, monospace"
+    # Font Families - Modern cross-platform font stacks optimized for readability and performance
+    MAIN_FONT = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Ubuntu', 'Cantarell', 'Oxygen', 'Fira Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+    MONO_FONT = "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Monaco', 'Menlo', 'Ubuntu Mono', 'DejaVu Sans Mono', 'Consolas', 'Courier New', monospace"
 
     # Font Sizes
     FONT_XS = "10px"

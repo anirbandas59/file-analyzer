@@ -29,9 +29,9 @@ charts = [
     "matplotlib>=3.5.0",
     "numpy>=1.21.0",
 ]
-svg = [
-    "pyqt6-svg>=6.9.1",
-]
+# svg = [
+#     # pyqt6-svg>=6.9.1  # Package not available in registry - using local SVG files instead
+# ]
 
 [project.urls]
 Homepage = "https://github.com/fileanalyzer/FileAnalyzer"

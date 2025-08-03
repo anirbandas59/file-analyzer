@@ -247,9 +247,9 @@ class DarkThemePalette:
 @dataclass
 class Typography:
     """Typography system with semantic naming"""
-    # Font families
-    FONT_FAMILY_PRIMARY = "Segoe UI, system-ui, -apple-system, sans-serif"
-    FONT_FAMILY_MONOSPACE = "Consolas, Monaco, 'Courier New', monospace"
+    # Font families - Modern cross-platform font stacks optimized for readability and performance
+    FONT_FAMILY_PRIMARY = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Ubuntu', 'Cantarell', 'Oxygen', 'Fira Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+    FONT_FAMILY_MONOSPACE = "'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Monaco', 'Menlo', 'Ubuntu Mono', 'DejaVu Sans Mono', 'Consolas', 'Courier New', monospace"
 
     # Font sizes (in pt)
     FONT_XXS = 10
@@ -387,36 +387,15 @@ class IconSystem:
     SIZE_XL = 32
     SIZE_XXL = 48
 
-    # Icon mappings for different themes
-    ICONS: ClassVar[dict[str, dict[str, str]]] = {
-        "folder": {
-            "light": "📁",
-            "dark": "📁",
-            "unicode": "📁"
-        },
-        "file": {
-            "light": "📄",
-            "dark": "📄",
-            "unicode": "📄"
-        },
-        "chart": {
-            "light": "📊",
-            "dark": "📊",
-            "unicode": "📊"
-        },
-        "settings": {
-            "light": "⚙️",
-            "dark": "⚙️",
-            "unicode": "⚙️"
-        },
-        "refresh": {
-            "light": "🔄",
-            "dark": "🔄",
-            "unicode": "🔄"
-        },
-        "search": {
-            "light": "🔍",
-            "dark": "🔍",
-            "unicode": "🔍"
-        }
+    # Icon mappings - now using SVG files from resource/icons/
+    ICONS: ClassVar[dict[str, str]] = {
+        "folder": "folder",
+        "file": "file",
+        "chart": "chart",
+        "settings": "settings",
+        "refresh": "refresh",
+        "search": "search",
+        "home": "home",
+        "close": "close",
+        "menu": "menu"
     }
